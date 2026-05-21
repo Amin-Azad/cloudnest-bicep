@@ -22,6 +22,22 @@ module networkModule './modules/network.bicep'= {
   }
 }
 
+module storageModule './modules/storage.bicep'= {
+  name:'storage-deployment-${environment}'
+  params: {
+    location:location 
+    tags: tags
+    environment:environment 
+    projectName: projectName
+  }
+}
+
 output vnetName string = networkModule.outputs.vnetName 
 output vnetId string = networkModule.outputs.vnetId
+
+@description('storaeg account outputs')
+output storageAccountName string = storageModule.outputs.storageAccountName
+output storageAccountId string = storageModule.outputs.storageAccountId
+output blobContainerName string = storageModule.outputs.uploadsContainerName
+output fileShareName string = storageModule.outputs.fileShareName
 
