@@ -1,0 +1,29 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# VS Code
+.vscode/
+
+# Terraform
+*.tfstate
+*.tfstate.*
+
+# Bicep build files
+*.json
+
+# Logs
+*.log
+
+# Environment files
+.env
+
+# Outputs
+outputs/*
+!outputs/.gitkeep
+
+# Azure CLI cache
+.azure/
+
+# Temporary files
+*.tmp
