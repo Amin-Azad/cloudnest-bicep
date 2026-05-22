@@ -31,6 +31,21 @@ module storageModule './modules/storage.bicep'= {
     projectName: projectName
   }
 }
+module privateEndpointModule './modules/private-endpoint.bicep' = {
+  name: 'private-endpoint-deployment-${environment}'
+  params: {
+    location: location
+    projectName: projectName
+    environment: environment
+    tags: tags
+
+    storageAccountId: storageModule.outputs.storageAccountId
+  
+
+    vnetId: networkModule.outputs.vnetId
+    subnetPrivateid: networkModule.outputs.subnetPrivateId
+  }
+}
 
 output vnetName string = networkModule.outputs.vnetName 
 output vnetId string = networkModule.outputs.vnetId
@@ -41,3 +56,8 @@ output storageAccountId string = storageModule.outputs.storageAccountId
 output blobContainerName string = storageModule.outputs.uploadsContainerName
 output fileShareName string = storageModule.outputs.fileShareName
 
+@description('private endpoint')
+output blobPrivateEndpointName string = privateEndpointModule.outputs.blobPrivateEndpointName
+output filePrivateEndpointName string = privateEndpointModule.outputs.filePrivateEndpointName
+output blobPrivateDnsZoneName string = privateEndpointModule.outputs.blobPrivateDnsZoneName
+output filePrivateDnsZoneName string = privateEndpointModule.outputs.filePrivateDnsZoneName
