@@ -56,3 +56,5 @@ output storageAccountId string = storaegAccount.id
 output uploadsContainerName string = uploadsContainer.name
 
 output fileShareName string = sharedFIleShare.name
+
+

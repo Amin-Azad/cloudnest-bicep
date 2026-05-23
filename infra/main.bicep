@@ -47,6 +47,18 @@ module privateEndpointModule './modules/private-endpoint.bicep' = {
   }
 }
 
+module appServiceModule './modules/app-service.bicep'= {
+  name: 'app-service-deployment-${environment}'
+  params: {
+    location:'northeurope'
+    tags: tags
+    environment: environment
+    projectname: projectName
+    storageAccountName: storageModule.outputs.storageAccountName
+    subNetId: networkModule.outputs.subnetAppId
+  }
+}
+
 output vnetName string = networkModule.outputs.vnetName 
 output vnetId string = networkModule.outputs.vnetId
 
@@ -61,3 +73,9 @@ output blobPrivateEndpointName string = privateEndpointModule.outputs.blobPrivat
 output filePrivateEndpointName string = privateEndpointModule.outputs.filePrivateEndpointName
 output blobPrivateDnsZoneName string = privateEndpointModule.outputs.blobPrivateDnsZoneName
 output filePrivateDnsZoneName string = privateEndpointModule.outputs.filePrivateDnsZoneName
+
+
+output appServicePlanName string = appServiceModule.outputs.appServicePlanName
+output webAppName string = appServiceModule.outputs.webAppName
+output webdefaultHostName string = appServiceModule.outputs.webAppDefaultHostNAme
+output webAppPrincipalId string = appServiceModule.outputs.webAppPrincipalId
