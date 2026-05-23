@@ -50,12 +50,22 @@ module privateEndpointModule './modules/private-endpoint.bicep' = {
 module appServiceModule './modules/app-service.bicep'= {
   name: 'app-service-deployment-${environment}'
   params: {
-    location:'northeurope'
+    location: location
     tags: tags
     environment: environment
     projectname: projectName
     storageAccountName: storageModule.outputs.storageAccountName
     subNetId: networkModule.outputs.subnetAppId
+  }
+}
+
+module slotModule './modules/appservice-slot.bicep' = {
+  name: 'slot-deployment-${environment}'
+  params: {
+    location: location
+    webAppName: appServiceModule.outputs.webAppName
+    slotName: 'staging'
+    tags: tags
   }
 }
 

@@ -36,18 +36,24 @@ resource nsgApp 'Microsoft.Network/networkSecurityGroups@2025-05-01'= {
     tags:tags
   }
 
-  resource subnetApp 'Microsoft.Network/virtualNetworks/subnets@2025-05-01'= {
-    parent:vnet
-    name: 'snet-app'
-
-    properties:{
-      addressPrefix: '10.10.1.0/24'
-
-      networkSecurityGroup: {
-        id: nsgApp.id
-      }
+  resource subnetApp 'Microsoft.Network/virtualNetworks/subnets@2025-05-01' = {
+  parent: vnet
+  name: 'snet-app'
+  properties: {
+    addressPrefix: '10.10.1.0/24'
+    networkSecurityGroup: {
+      id: nsgApp.id
     }
+    delegations: [
+      {
+        name: 'delegation-appservice'
+        properties: {
+          serviceName: 'Microsoft.Web/serverFarms'
+        }
+      }
+    ]
   }
+}
   resource subnetData 'Microsoft.Network/virtualNetworks/subnets@2025-05-01'= {
     parent:vnet
     name: 'snet-data'

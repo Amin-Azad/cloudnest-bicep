@@ -14,8 +14,8 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2025-03-01' = {
   tags:tags
 
   sku:{
-    name:'B1'
-    tier:'Basic'
+    name:'S1'
+    tier:'Standard'
     capacity:1
     
   }
@@ -67,6 +67,7 @@ resource webApp 'Microsoft.Web/sites@2025-03-01'= {
 }
 
 output appServicePlanName string = appServicePlan.name
+output appServicePlanId string = appServicePlan.id
 output webAppName string = webApp.name
 output webAppDefaultHostNAme string = webApp.properties.defaultHostName
 output webAppPrincipalId string = webApp.identity.principalId
