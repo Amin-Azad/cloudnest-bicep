@@ -4,6 +4,8 @@ param environment string
 param tags object
 param subNetId string
 param storageAccountName string
+param appInsightsConnectionString string
+
 
 var appServicePlanName = 'asp-${projectname}-${environment}'
 var webAppName = 'webAppName-${projectname}-${environment}-${uniqueString(resourceGroup().id)}'
@@ -56,11 +58,18 @@ resource webApp 'Microsoft.Web/sites@2025-03-01'= {
           value:storageAccountName
         }
         {
-          name: 'WEBSITR_VNET_ROUTE_ALL'
+          name: 'WEBSITE_VNET_ROUTE_ALL'
           value:'1'
 
         }
-        
+         {
+          name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
+          value: appInsightsConnectionString
+         }
+         {
+          name: 'ApplicationInsightsAgent_EXTENSION_VERSION'
+          value: '~3'
+         }
       ]
     }
   }
@@ -69,5 +78,6 @@ resource webApp 'Microsoft.Web/sites@2025-03-01'= {
 output appServicePlanName string = appServicePlan.name
 output appServicePlanId string = appServicePlan.id
 output webAppName string = webApp.name
+output webAppId string = webApp.id
 output webAppDefaultHostNAme string = webApp.properties.defaultHostName
 output webAppPrincipalId string = webApp.identity.principalId

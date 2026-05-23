@@ -3,6 +3,7 @@ targetScope = 'resourceGroup'
 param projectName string = 'cloudnest'
 param location string = resourceGroup().location
 param environment string = 'dev'
+param actionGroupEmail string = 'aminazad079@gmail.com'
 
 
 
@@ -56,6 +57,7 @@ module appServiceModule './modules/app-service.bicep'= {
     projectname: projectName
     storageAccountName: storageModule.outputs.storageAccountName
     subNetId: networkModule.outputs.subnetAppId
+    appInsightsConnectionString:appInsightsModule.outputs.connectionString
   }
 }
 
@@ -66,6 +68,48 @@ module slotModule './modules/appservice-slot.bicep' = {
     webAppName: appServiceModule.outputs.webAppName
     slotName: 'staging'
     tags: tags
+  }
+}
+
+module monitoringModule './modules/monitoring.bicep' = {
+  name:'monitoring-deployment-${environment}'
+  params: {
+    location: location
+    tags: tags
+    environment: environment
+    projectName:projectName 
+  }
+}
+
+module appInsightsModule './modules/app-insights.bicep' = {
+  name: 'app-insights-module-${environment}'
+  params: {
+    location: location
+    tags: tags
+    environement: environment
+    projectName: projectName
+    workspaceId: monitoringModule.outputs.workspaceId 
+  }
+}
+module diagnosticsModule 'modules/diagnostics.bicep' = {
+  name:'diagnostics-deployment-${environment}'
+  params: {
+    logAnalyticsWorkspaceId: monitoringModule.outputs.workspaceId
+    webAppName:appServiceModule.outputs.webAppName 
+    storageAccountName: storageModule.outputs.storageAccountName
+  }
+}
+
+module alertsModule './modules/alerts.bicep' = {
+  name: 'alerts-deployment-${environment}'
+  params: {
+    location: location
+    environment: environment
+    projectName: projectName
+    tags: tags
+    webAppId: appServiceModule.outputs.webAppId
+    appServicePlanId: appServiceModule.outputs.appServicePlanId
+    actionGroupEmail: actionGroupEmail
   }
 }
 
@@ -89,3 +133,6 @@ output appServicePlanName string = appServiceModule.outputs.appServicePlanName
 output webAppName string = appServiceModule.outputs.webAppName
 output webdefaultHostName string = appServiceModule.outputs.webAppDefaultHostNAme
 output webAppPrincipalId string = appServiceModule.outputs.webAppPrincipalId
+
+output appInsightsName string = appInsightsModule.outputs.appInsightsName
+output appInsightsId string = appInsightsModule.outputs.appInsightId
