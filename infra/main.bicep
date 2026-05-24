@@ -113,6 +113,16 @@ module alertsModule './modules/alerts.bicep' = {
   }
 }
 
+module keyVaultModule './modules/keyvault.bicep' = {
+  name:'keyvault-deployment-${environment}'
+  params: {
+    location: location
+    tags: tags
+    environment: environment
+    projectName: projectName
+  }
+}
+
 output vnetName string = networkModule.outputs.vnetName 
 output vnetId string = networkModule.outputs.vnetId
 
@@ -136,3 +146,7 @@ output webAppPrincipalId string = appServiceModule.outputs.webAppPrincipalId
 
 output appInsightsName string = appInsightsModule.outputs.appInsightsName
 output appInsightsId string = appInsightsModule.outputs.appInsightId
+
+
+output keyVaultName string = keyVaultModule.outputs.keyvaultName
+output keyVaultUri string = keyVaultModule.outputs.keyVaultUri
