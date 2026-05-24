@@ -60,6 +60,15 @@ module appServiceModule './modules/app-service.bicep'= {
     appInsightsConnectionString:appInsightsModule.outputs.connectionString
   }
 }
+module frontDoorModule './modules/frontdoor.bicep' = {
+  name: 'frontdoor-deployment-${environment}'
+  params: {
+    environment: environment
+    projectName: projectName
+    tags: tags
+    webAppDefaultHostName: appServiceModule.outputs.webAppDefaultHostNAme
+  }
+}
 
 module slotModule './modules/appservice-slot.bicep' = {
   name: 'slot-deployment-${environment}'
