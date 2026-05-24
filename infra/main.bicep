@@ -41,6 +41,7 @@ module privateEndpointModule './modules/private-endpoint.bicep' = {
     tags: tags
 
     storageAccountId: storageModule.outputs.storageAccountId
+    keyVaultId: keyVaultModule.outputs.keyVaultId
   
 
     vnetId: networkModule.outputs.vnetId

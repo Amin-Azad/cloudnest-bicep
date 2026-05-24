@@ -19,7 +19,11 @@ resource keyVault 'Microsoft.KeyVault/vaults@2025-05-01'= {
     enabledForDeployment:false
     enabledForDiskEncryption:false
     enabledForTemplateDeployment:true
-    publicNetworkAccess:'Enabled'
+    publicNetworkAccess:'Disabled'
+    networkAcls:{
+      bypass:'AzureServices'
+      defaultAction:'Deny'
+    }
   }
 }
 output keyvaultName string = keyVault.name
