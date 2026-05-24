@@ -123,6 +123,18 @@ module keyVaultModule './modules/keyvault.bicep' = {
   }
 }
 
+module autoscaleModule './modules/autoscale.bicep' = {
+  name: 'autoscale-deployment-${environment}'
+  params: {
+    location: location
+    environment: environment
+    appServicePlanId: appServiceModule.outputs.appServicePlanId
+    appServicePlanName: appServiceModule.outputs.appServicePlanName
+    tags: tags
+    
+  }
+}
+
 output vnetName string = networkModule.outputs.vnetName 
 output vnetId string = networkModule.outputs.vnetId
 
@@ -150,3 +162,4 @@ output appInsightsId string = appInsightsModule.outputs.appInsightId
 
 output keyVaultName string = keyVaultModule.outputs.keyvaultName
 output keyVaultUri string = keyVaultModule.outputs.keyVaultUri
+
