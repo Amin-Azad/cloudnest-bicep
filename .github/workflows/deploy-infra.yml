@@ -1,0 +1,51 @@
+name: Deploy CloudNest Infrastructure
+
+on:
+  push:
+    branches:
+      - main
+
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Setup Bicep
+        run: az bicep install
+
+      - name: Validate Bicep Template
+        run: |
+          az deployment group validate \
+            --resource-group rg-cloudnest-dev \
+            --template-file infra/main.bicep
+
+      - name: What-If Deployment
+        run: |
+          az deployment group what-if \
+            --resource-group rg-cloudnest-dev \
+            --template-file infra/main.bicep
+
+      - name: Deploy Infrastructure
+        if: github.event_name == 'push'
+        run: |
+          az deployment group create \
+            --resource-group rg-cloudnest-dev \
+            --template-file infra/main.bicep
