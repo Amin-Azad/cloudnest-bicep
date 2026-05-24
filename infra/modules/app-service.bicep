@@ -5,10 +5,10 @@ param tags object
 param subNetId string
 param storageAccountName string
 param appInsightsConnectionString string
+param nameSuffix string = ''
 
-
-var appServicePlanName = 'asp-${projectname}-${environment}'
-var webAppName = 'webAppName-${projectname}-${environment}-${uniqueString(resourceGroup().id)}'
+var appServicePlanName = 'asp-${projectname}-${environment}${nameSuffix}'
+var webAppName = 'webapp-${projectname}-${environment}${nameSuffix}-${uniqueString(resourceGroup().id, location)}'
 
 resource appServicePlan 'Microsoft.Web/serverfarms@2025-03-01' = {
   name: appServicePlanName
@@ -40,7 +40,8 @@ resource webApp 'Microsoft.Web/sites@2025-03-01'= {
   properties:{
     serverFarmId:appServicePlan.id
     httpsOnly:true
-    virtualNetworkSubnetId:subNetId
+   // virtualNetworkSubnetId:subNetId
+   virtualNetworkSubnetId: empty(subNetId) ? null : subNetId
 
     siteConfig: {
       linuxFxVersion: 'NODE|20-lts'
@@ -81,3 +82,4 @@ output webAppName string = webApp.name
 output webAppId string = webApp.id
 output webAppDefaultHostNAme string = webApp.properties.defaultHostName
 output webAppPrincipalId string = webApp.identity.principalId
+

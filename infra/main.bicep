@@ -60,6 +60,24 @@ module appServiceModule './modules/app-service.bicep'= {
     appInsightsConnectionString:appInsightsModule.outputs.connectionString
   }
 }
+module appServiceDrModule './modules/app-service.bicep'= {
+  name: 'app-service-dr-deployment-${environment}'
+  params: {
+    location: 'swedencentral'
+    tags: tags
+    environment: environment
+    projectname: projectName
+    
+    
+
+    nameSuffix: '-dr'
+
+    storageAccountName: storageModule.outputs.storageAccountName
+    //subNetId: networkModule.outputs.subnetAppId
+    subNetId: ''
+    appInsightsConnectionString: appInsightsModule.outputs.connectionString
+  }
+}
 module frontDoorModule './modules/frontdoor.bicep' = {
   name: 'frontdoor-deployment-${environment}'
   params: {
@@ -67,6 +85,7 @@ module frontDoorModule './modules/frontdoor.bicep' = {
     projectName: projectName
     tags: tags
     webAppDefaultHostName: appServiceModule.outputs.webAppDefaultHostNAme
+    secondaryWebAppDefaultHostName:appServiceDrModule.outputs.webAppDefaultHostNAme
   }
 }
 

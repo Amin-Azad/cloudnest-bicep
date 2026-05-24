@@ -2,11 +2,13 @@ param environment string
 param projectName string
 param tags object
 param webAppDefaultHostName string
+param secondaryWebAppDefaultHostName string
 
 var frontDoorProfileName = 'afd-${projectName}-${environment}'
 var frontDoorEndpointName = 'fde-${projectName}-${environment}-${uniqueString(resourceGroup().id)}'
 var originGroupName = 'og-${projectName}-${environment}'
-var originName = 'origin-appservice-${environment}'
+var primaryOriginName = 'origin-primary-${environment}'
+var secondaryOriginName = 'origin-secondary-${environment}'
 var routeName = 'route-${projectName}-${environment}'
 var wafPolicyName = 'waf-${projectName}-${environment}'
 var securityPolicyName = 'security-${projectName}-${environment}'
@@ -32,7 +34,7 @@ var securityPolicyName = 'security-${projectName}-${environment}'
     // For production later:
     // 1. Change both SKUs to 'Premium_AzureFrontDoor'
     // 2. Replace customRules with managedRules.
-    /*
+    
     managedRules: {
       managedRuleSets: [
         {
@@ -105,13 +107,13 @@ resource originGroup 'Microsoft.Cdn/profiles/originGroups@2021-06-01' = {
       probePath: '/'
       probeRequestType: 'HEAD'
       probeProtocol: 'Https'
-      probeIntervalInSeconds: 100
+      probeIntervalInSeconds: 30
     }
   }
 }
 
-resource origin 'Microsoft.Cdn/profiles/originGroups/origins@2021-06-01' = {
-  name: originName
+resource primaryOrigin 'Microsoft.Cdn/profiles/originGroups/origins@2021-06-01' = {
+  name: primaryOriginName
   parent: originGroup
   properties: {
     hostName: webAppDefaultHostName
@@ -123,12 +125,26 @@ resource origin 'Microsoft.Cdn/profiles/originGroups/origins@2021-06-01' = {
     enabledState: 'Enabled'
   }
 }
+resource secondaryOrigin 'Microsoft.Cdn/profiles/originGroups/origins@2021-06-01' = {
+  name: secondaryOriginName
+  parent: originGroup
+  properties: {
+    hostName: secondaryWebAppDefaultHostName
+    originHostHeader: secondaryWebAppDefaultHostName
+    httpPort: 80
+    httpsPort: 443
+    priority: 2
+    weight: 1000
+    enabledState: 'Enabled'
+  }
+}
 
 resource route 'Microsoft.Cdn/profiles/afdEndpoints/routes@2021-06-01' = {
   name: routeName
   parent: frontDoorEndpoint
   dependsOn: [
-    origin
+    primaryOrigin
+    secondaryOrigin
   ]
   properties: {
     originGroup: {
