@@ -23,11 +23,29 @@ resource storaegAccount 'Microsoft.Storage/storageAccounts@2026-04-01'= {
     allowBlobPublicAccess: false
     supportsHttpsTrafficOnly: true
 
+    publicNetworkAccess: 'Disabled'
+    networkAcls: {
+    defaultAction: 'Deny'
+    bypass: 'AzureServices'
+    }
+
   } 
 }
 resource blobService 'Microsoft.Storage/storageAccounts/blobServices@2026-04-01'= {
   parent:storaegAccount
   name: 'default'
+
+  properties:{
+    deleteRetentionPolicy:{
+      enabled:true
+      days:14
+    }
+    containerDeleteRetentionPolicy:{
+      enabled:true
+      days:14
+    }
+    isVersioningEnabled:true
+  }
 }
 resource uploadsContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2026-04-01'= {
   parent:blobService

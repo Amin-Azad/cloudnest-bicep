@@ -107,7 +107,7 @@ resource originGroup 'Microsoft.Cdn/profiles/originGroups@2021-06-01' = {
       probePath: '/'
       probeRequestType: 'HEAD'
       probeProtocol: 'Https'
-      probeIntervalInSeconds: 30
+      probeIntervalInSeconds: 100
     }
   }
 }
