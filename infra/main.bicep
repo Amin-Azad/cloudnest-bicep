@@ -11,6 +11,8 @@ var tags = {
   project: projectName
   environment: environment
   owner: 'amin'
+  costCenter: 'engineering'
+  managedBy: 'bicep'
 }
 
 module networkModule './modules/network.bicep'= {

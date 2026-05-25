@@ -4,6 +4,7 @@ param environment string
 param allowedLocations array = [
   'westeurope'
   'northeurope'
+  'swedencentral'
 ]
 param requiredTags array = [
   'project'
