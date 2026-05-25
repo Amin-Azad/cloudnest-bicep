@@ -164,6 +164,13 @@ module autoscaleModule './modules/autoscale.bicep' = {
   }
 }
 
+module policyModule './modules/policy.bicep'= {
+  name:'policy-deployment-${environment}'
+  params: {
+    environment: environment
+  }
+}
+
 output vnetName string = networkModule.outputs.vnetName 
 output vnetId string = networkModule.outputs.vnetId
 
