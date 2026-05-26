@@ -1,5 +1,5 @@
 CloudNest Azure Validation Report
-Generated on: Tue May 26 12:29:41 CEST 2026
+Generated on: Tue May 26 13:50:18 CEST 2026
 Resource Group: rg-cloudnest-dev
 ==============================================
 
@@ -49,7 +49,7 @@ security-cloudnest-dev  WebApplicationFirewall  Succeeded            NotStarted
 
 8. WAF Policy
 ----------------------------------------------
-The command requires the extension front-door. Do you want to install it now? The command will continue to run after the extension is installed. (Y/n): Name             Mode        Enabled    ProvisioningState
+Name             Mode        Enabled    ProvisioningState
 ---------------  ----------  ---------  -------------------
 wafcloudnestdev  Prevention  Enabled    Succeeded
 
@@ -137,11 +137,11 @@ remediate-project-tag-dev      Succeeded            /subscriptions/d3da25e5-680e
 ----------------------------------------------
 Name                                                             Type                                                       Project    Environment    Owner    ManagedBy
 ---------------------------------------------------------------  ---------------------------------------------------------  ---------  -------------  -------  -----------
-stdevnzeikn6cfy4zq                                               Microsoft.Storage/storageAccounts                          cloudnest  dev            amin     bicep
 nsg-cloudnest-private-dev                                        Microsoft.Network/networkSecurityGroups                    cloudnest  dev            amin     bicep
 nsg-cloudnest-app-dev                                            Microsoft.Network/networkSecurityGroups                    cloudnest  dev            amin     bicep
 nsg-cloudnest-data-dev                                           Microsoft.Network/networkSecurityGroups                    cloudnest  dev            amin     bicep
 vnet-cloudnest-dev                                               Microsoft.Network/virtualNetworks                          cloudnest  dev            amin     bicep
+stdevnzeikn6cfy4zq                                               Microsoft.Storage/storageAccounts                          cloudnest  dev            amin     bicep
 pep-cloudnest-blob-dev                                           Microsoft.Network/privateEndpoints                         cloudnest  dev            amin     bicep
 privatelink.file.core.windows.net                                Microsoft.Network/privateDnsZones                          cloudnest  dev            amin     bicep
 privatelink.blob.core.windows.net                                Microsoft.Network/privateDnsZones                          cloudnest  dev            amin     bicep
