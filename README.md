@@ -170,6 +170,42 @@ This helps reduce deployment risk and downtime.
 - Autoscaling configuration
 - Storage lifecycle management
 
+## Application CI/CD
+
+CloudNest includes a complete application deployment pipeline using GitHub Actions and Azure App Service deployment slots.
+
+### Features
+
+- GitHub Actions CI/CD
+- OIDC-based Azure authentication
+- Azure App Service deployment
+- Staging slot deployment workflow
+- Production slot swap deployment
+- Managed Identity
+- Azure Key Vault secret integration
+- Infrastructure and application pipeline separation
+
+### Deployment Flow
+
+```text
+GitHub Push
+    ↓
+GitHub Actions
+    ↓
+Deploy to Staging Slot
+    ↓
+Validation
+    ↓
+Slot Swap to Production
+```
+
+### Live Application Features
+
+The sample Node.js application demonstrates:
+
+- Environment awareness
+- Secure secret retrieval from Key Vault
+- Cloud-native deployment workflow
 ---
 
 # Project Structure

@@ -1,0 +1,14 @@
+{
+  "deployLocation": {
+    "type": "String",
+    "value": "uksouth"
+  },
+  "storageAccountId": {
+    "type": "String",
+    "value": "/subscriptions/d3da25e5-680e-459c-99cf-0c4be70f4aad/resourceGroups/rg-cloudnest-dev/providers/Microsoft.Storage/storageAccounts/cloudnesdevnzeikn6c"
+  },
+  "storageAccountName": {
+    "type": "String",
+    "value": "cloudnesdevnzeikn6c"
+  }
+}
