@@ -95,6 +95,7 @@ module frontDoorModule './modules/frontdoor.bicep' = {
 module slotModule './modules/appservice-slot.bicep' = {
   name: 'slot-deployment-${environment}'
   params: {
+    keyVaultName: keyVaultModule.outputs.keyvaultName
     location: location
     webAppName: appServiceModule.outputs.webAppName
     slotName: 'staging'
