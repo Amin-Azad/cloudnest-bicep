@@ -146,13 +146,6 @@ Additional architecture details are available in:
 - Azure Workbooks dashboards
 - Operational monitoring and visibility
 
-## CI/CD Automation
-
-- GitHub Actions deployment pipeline
-- OIDC federated authentication
-- Automated Bicep deployments
-- Infrastructure validation workflow
-
 ## Deployment Slots
 
 CloudNest uses Azure App Service deployment slots to support staging and production workflows.
@@ -170,31 +163,56 @@ This helps reduce deployment risk and downtime.
 - Autoscaling configuration
 - Storage lifecycle management
 
-## Application CI/CD
+## CI/CD Pipelines
 
-CloudNest includes a complete application deployment pipeline using GitHub Actions and Azure App Service deployment slots.
+CloudNest implements separate infrastructure and application deployment pipelines using GitHub Actions.
 
-### Features
+### Infrastructure CI/CD
 
-- GitHub Actions CI/CD
-- OIDC-based Azure authentication
-- Azure App Service deployment
-- Staging slot deployment workflow
-- Production slot swap deployment
-- Managed Identity
-- Azure Key Vault secret integration
-- Infrastructure and application pipeline separation
+Automates Azure infrastructure deployments using:
 
-### Deployment Flow
+- Azure Bicep
+- GitHub Actions
+- OIDC Federation
+- What-If validation
+- Incremental ARM deployments
+
+Documentation:
 
 ```text
-GitHub Push
+docs/infrastructure-cicd.md
+```
+
+---
+
+### Application CI/CD
+
+Automates application deployments using:
+
+- GitHub Actions
+- Azure App Service
+- Deployment Slots
+- Managed Identity
+- Azure Key Vault
+
+Documentation:
+
+```text
+docs/application-cicd.md
+```
+
+---
+
+### CI/CD Architecture
+
+```text
+Infrastructure Pipeline
     ↓
-GitHub Actions
+Deploy Azure Resources
+
+Application Pipeline
     ↓
-Deploy to Staging Slot
-    ↓
-Validation
+Deploy App to Staging
     ↓
 Slot Swap to Production
 ```
