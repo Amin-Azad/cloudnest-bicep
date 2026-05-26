@@ -61,6 +61,7 @@ module appServiceModule './modules/app-service.bicep'= {
     storageAccountName: storageModule.outputs.storageAccountName
     subNetId: networkModule.outputs.subnetAppId
     appInsightsConnectionString:appInsightsModule.outputs.connectionString
+    keyVaultName: keyVaultModule.outputs.keyVaultName
   }
 }
 module appServiceDrModule './modules/app-service.bicep'= {
@@ -70,6 +71,7 @@ module appServiceDrModule './modules/app-service.bicep'= {
     tags: tags
     environment: environment
     projectname: projectName
+    keyVaultName: keyVaultModule.outputs.keyVaultName
     
     
 
@@ -95,7 +97,7 @@ module frontDoorModule './modules/frontdoor.bicep' = {
 module slotModule './modules/appservice-slot.bicep' = {
   name: 'slot-deployment-${environment}'
   params: {
-    keyVaultName: keyVaultModule.outputs.keyvaultName
+    keyVaultName: keyVaultModule.outputs.keyVaultName
     location: location
     webAppName: appServiceModule.outputs.webAppName
     slotName: 'staging'
@@ -199,6 +201,6 @@ output appInsightsName string = appInsightsModule.outputs.appInsightsName
 output appInsightsId string = appInsightsModule.outputs.appInsightId
 
 
-output keyVaultName string = keyVaultModule.outputs.keyvaultName
+output keyVaultName string = keyVaultModule.outputs.keyVaultName
 output keyVaultUri string = keyVaultModule.outputs.keyVaultUri
 

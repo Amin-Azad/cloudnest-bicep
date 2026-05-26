@@ -6,6 +6,7 @@ param subNetId string
 param storageAccountName string
 param appInsightsConnectionString string
 param nameSuffix string = ''
+param keyVaultName string
 
 var appServicePlanName = 'asp-${projectname}-${environment}${nameSuffix}'
 var webAppName = 'webapp-${projectname}-${environment}${nameSuffix}-${uniqueString(resourceGroup().id, location)}'
@@ -49,29 +50,36 @@ resource webApp 'Microsoft.Web/sites@2025-03-01'= {
       ftpsState:'Disabled'
       minTlsVersion:'1.2'
 
-      appSettings:[
-        {
-          name:'ENVIRONMENT'
-          value:environment
-        }
-        {
-          name:'STORAGE_ACCOUNT_NAME'
-          value:storageAccountName
-        }
-        {
-          name: 'WEBSITE_VNET_ROUTE_ALL'
-          value:'1'
-
-        }
-         {
-          name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
-          value: appInsightsConnectionString
-         }
-         {
-          name: 'ApplicationInsightsAgent_EXTENSION_VERSION'
-          value: '~3'
-         }
-      ]
+      appSettings: [
+  {
+    name: 'ENVIRONMENT'
+    value: environment
+  }
+  {
+    name: 'APP_ENVIRONMENT'
+    value: environment
+  }
+  {
+    name: 'APP_SECRET'
+    value: '@Microsoft.KeyVault(SecretUri=https://${keyVaultName}.vault.azure.net/secrets/app-secret/)'
+  }
+  {
+    name: 'STORAGE_ACCOUNT_NAME'
+    value: storageAccountName
+  }
+  {
+    name: 'WEBSITE_VNET_ROUTE_ALL'
+    value: '1'
+  }
+  {
+    name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
+    value: appInsightsConnectionString
+  }
+  {
+    name: 'ApplicationInsightsAgent_EXTENSION_VERSION'
+    value: '~3'
+  }
+]
     }
   }
 }
