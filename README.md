@@ -230,26 +230,54 @@ The sample Node.js application demonstrates:
 
 ```text
 cloudnest-bicep/
+├── .github/
+│   └── workflows/
+│       ├── deploy-infra.yml
+│       └── app-deploy.yml
+│
+├── docs/
+│   ├── application-cicd.md
+│   ├── finops.md
+│   ├── governance-policy.md
+│   ├── infrastructure-cicd.md
+│   └── workBook.md
 │
 ├── infra/
 │   ├── main.bicep
+│   ├── main.json
+│   ├── main.parameters.json
 │   └── modules/
+│
+├── outputs/
+│   ├── phase1-output.txt
+│   └── validation-output.txt
+│
+├── screenshots/
+│   ├── alerts.PNG
+│   ├── architecture-diagram.PNG
+│   ├── autoscale.PNG
+│   ├── deployment-slots.PNG
+│   ├── frontdoor-waf.PNG
+│   ├── keyvault-reference.PNG
+│   ├── policy-compliance.PNG
+│   └── private-endpoints.PNG
 │
 ├── scripts/
 │   └── validate-cloudnest.sh
 │
-├── outputs/
-│   └── validation-output.txt
+├── src/
+│   ├── app.js
+│   ├── package.json
+│   ├── package-lock.json
+│   └── node_modules/
 │
-├── screenshots
-│
-├── README.md
 ├── ARCHITECTURE.md
-├── SECURITY.md
+├── GOVERNANCE.md
 ├── OPERATIONS.md
-└── GOVERNANCE.md
+├── SECURITY.md
+├── README.md
+└── .gitignore
 ```
-
 ---
 
 # Quick Deployment
