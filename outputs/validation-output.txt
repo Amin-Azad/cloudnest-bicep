@@ -1,0 +1,176 @@
+CloudNest Azure Validation Report
+Generated on: Tue May 26 12:29:41 CEST 2026
+Resource Group: rg-cloudnest-dev
+==============================================
+
+1. Resource Group
+----------------------------------------------
+Name              Location
+----------------  ----------
+rg-cloudnest-dev  westeurope
+
+2. App Services
+----------------------------------------------
+Name                                   Location        State    HostName
+-------------------------------------  --------------  -------  -------------------------------------------------------
+webapp-cloudnest-dev-dr-2a2mwxpd6nkfm  Sweden Central  Running  webapp-cloudnest-dev-dr-2a2mwxpd6nkfm.azurewebsites.net
+webapp-cloudnest-dev-baz6xqhbrtpb6     West Europe     Running  webapp-cloudnest-dev-baz6xqhbrtpb6.azurewebsites.net
+
+3. Deployment Slots
+----------------------------------------------
+Slot     State    DefaultHostName
+-------  -------  ------------------------------------------------------------
+staging  Running  webapp-cloudnest-dev-baz6xqhbrtpb6-staging.azurewebsites.net
+
+4. Front Door Profile
+----------------------------------------------
+Name               Sku                      ProvisioningState
+-----------------  -----------------------  -------------------
+afd-cloudnest-dev  Standard_AzureFrontDoor  Succeeded
+
+5. Front Door Endpoint
+----------------------------------------------
+Name                             HostName                                                          Enabled    ProvisioningState
+-------------------------------  ----------------------------------------------------------------  ---------  -------------------
+fde-cloudnest-dev-nzeikn6cfy4zq  fde-cloudnest-dev-nzeikn6cfy4zq-bxe9fpc3c0hsbneh.z03.azurefd.net  Enabled    Succeeded
+
+6. Front Door Origins / DR Failover
+----------------------------------------------
+Name                  HostName                                                 Priority    Enabled
+--------------------  -------------------------------------------------------  ----------  ---------
+origin-primary-dev    webapp-cloudnest-dev-baz6xqhbrtpb6.azurewebsites.net     1           Enabled
+origin-secondary-dev  webapp-cloudnest-dev-dr-2a2mwxpd6nkfm.azurewebsites.net  2           Enabled
+
+7. Front Door WAF Security Policy
+----------------------------------------------
+Name                    Type                    ProvisioningState    DeploymentStatus
+----------------------  ----------------------  -------------------  ------------------
+security-cloudnest-dev  WebApplicationFirewall  Succeeded            NotStarted
+
+8. WAF Policy
+----------------------------------------------
+The command requires the extension front-door. Do you want to install it now? The command will continue to run after the extension is installed. (Y/n): Name             Mode        Enabled    ProvisioningState
+---------------  ----------  ---------  -------------------
+wafcloudnestdev  Prevention  Enabled    Succeeded
+
+9. Key Vault
+----------------------------------------------
+Name                Location    PublicNetworkAccess
+------------------  ----------  ---------------------
+kvdevnzeikn6cfy4zq  westeurope  Disabled
+
+10. Private Endpoints
+----------------------------------------------
+Name                    Location    GroupId
+----------------------  ----------  ---------
+pep-cloudnest-blob-dev  westeurope  blob
+pep-cloudnest-file-dev  westeurope  file
+pep-cloudnest-kv-dev    westeurope  vault
+
+11. Private DNS Zones
+----------------------------------------------
+Name
+---------------------------------
+privatelink.blob.core.windows.net
+privatelink.file.core.windows.net
+privatelink.vaultcore.azure.net
+
+12. Storage Accounts
+----------------------------------------------
+Name                Location    Kind       PublicNetworkAccess    AllowBlobPublicAccess
+------------------  ----------  ---------  ---------------------  -----------------------
+stdevnzeikn6cfy4zq  westeurope  StorageV2  Disabled               False
+
+13. Log Analytics Workspaces
+----------------------------------------------
+Name               Location    RetentionDays
+-----------------  ----------  ---------------
+law-cloudnest-dev  westeurope  30
+
+14. Application Insights
+----------------------------------------------
+Name                Location    ApplicationType
+------------------  ----------  -----------------
+appi-cloudnest-dev  westeurope  web
+
+15. Azure Monitor Alert Rules
+----------------------------------------------
+Name                          Enabled    Severity    WindowSize    EvaluationFrequency
+----------------------------  ---------  ----------  ------------  ---------------------
+alert-cloudnest-dev-http-5xx  True       2           PT5M          PT5M
+alert-cloudnest-dev-high-cpu  True       3           PT5M          PT5M
+
+16. Autoscale Configuration
+----------------------------------------------
+{
+  "Default": "1",
+  "Maximum": "2",
+  "Minimum": "1",
+  "RuleThresholds": [
+    70.0,
+    30.0
+  ]
+}
+
+17. Azure Policy Assignments
+----------------------------------------------
+Name                                EnforcementMode    Identity
+----------------------------------  -----------------  --------------
+policy-require-project-tag-dev      Default
+policy-require-environment-tag-dev  Default
+policy-require-owner-tag-dev        Default
+policy-allowed-locations-dev        Default
+policy-deny-public-blob-dev         Default
+policy-inherit-owner-tag-dev        Default            SystemAssigned
+policy-inherit-environment-tag-dev  Default            SystemAssigned
+policy-inherit-project-tag-dev      Default            SystemAssigned
+
+18. Azure Policy Remediation Tasks
+----------------------------------------------
+Name                           ProvisioningState    PolicyAssignment
+-----------------------------  -------------------  --------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+remediate-owner-tag-dev        Succeeded            /subscriptions/d3da25e5-680e-459c-99cf-0c4be70f4aad/resourcegroups/rg-cloudnest-dev/providers/microsoft.authorization/policyassignments/policy-inherit-owner-tag-dev
+remediate-environment-tag-dev  Succeeded            /subscriptions/d3da25e5-680e-459c-99cf-0c4be70f4aad/resourcegroups/rg-cloudnest-dev/providers/microsoft.authorization/policyassignments/policy-inherit-environment-tag-dev
+remediate-project-tag-dev      Succeeded            /subscriptions/d3da25e5-680e-459c-99cf-0c4be70f4aad/resourcegroups/rg-cloudnest-dev/providers/microsoft.authorization/policyassignments/policy-inherit-project-tag-dev
+
+19. Resource Tags Summary
+----------------------------------------------
+Name                                                             Type                                                       Project    Environment    Owner    ManagedBy
+---------------------------------------------------------------  ---------------------------------------------------------  ---------  -------------  -------  -----------
+stdevnzeikn6cfy4zq                                               Microsoft.Storage/storageAccounts                          cloudnest  dev            amin     bicep
+nsg-cloudnest-private-dev                                        Microsoft.Network/networkSecurityGroups                    cloudnest  dev            amin     bicep
+nsg-cloudnest-app-dev                                            Microsoft.Network/networkSecurityGroups                    cloudnest  dev            amin     bicep
+nsg-cloudnest-data-dev                                           Microsoft.Network/networkSecurityGroups                    cloudnest  dev            amin     bicep
+vnet-cloudnest-dev                                               Microsoft.Network/virtualNetworks                          cloudnest  dev            amin     bicep
+pep-cloudnest-blob-dev                                           Microsoft.Network/privateEndpoints                         cloudnest  dev            amin     bicep
+privatelink.file.core.windows.net                                Microsoft.Network/privateDnsZones                          cloudnest  dev            amin     bicep
+privatelink.blob.core.windows.net                                Microsoft.Network/privateDnsZones                          cloudnest  dev            amin     bicep
+pep-cloudnest-file-dev                                           Microsoft.Network/privateEndpoints                         cloudnest  dev            amin     bicep
+asp-cloudnest-dev                                                Microsoft.Web/serverFarms                                  cloudnest  dev            amin     bicep
+pep-cloudnest-blob-dev.nic.c290cca3-5b97-49dd-8f41-759bd570305f  Microsoft.Network/networkInterfaces                        cloudnest  dev            amin
+pep-cloudnest-file-dev.nic.bbf7cfda-95d5-4877-8677-331faa83697c  Microsoft.Network/networkInterfaces                        cloudnest  dev            amin
+privatelink.blob.core.windows.net/linkcloudnest-blob-dev         Microsoft.Network/privateDnsZones/virtualNetworkLinks      cloudnest  dev            amin
+privatelink.file.core.windows.net/linkcloudnest-file-dev         Microsoft.Network/privateDnsZones/virtualNetworkLinks      cloudnest  dev            amin
+law-cloudnest-dev                                                Microsoft.OperationalInsights/workspaces                   cloudnest  dev            amin     bicep
+appi-cloudnest-dev                                               Microsoft.Insights/components                              cloudnest  dev            amin     bicep
+Application Insights Smart Detection                             microsoft.insights/actiongroups
+ag-cloudnest-dev                                                 Microsoft.Insights/actiongroups                            cloudnest  dev            amin     bicep
+alert-cloudnest-dev-high-cpu                                     Microsoft.Insights/metricalerts                            cloudnest  dev            amin     bicep
+alert-cloudnest-dev-http-5xx                                     Microsoft.Insights/metricalerts                            cloudnest  dev            amin     bicep
+52f63c21-1432-44d7-aac9-0b94ad5b70a2                             microsoft.insights/workbooks
+kvdevnzeikn6cfy4zq                                               Microsoft.KeyVault/vaults                                  cloudnest  dev            amin     bicep
+autoscale-cloudnest-dev                                          Microsoft.Insights/autoscalesettings                       cloudnest  dev            amin     bicep
+afd-cloudnest-dev                                                Microsoft.Cdn/profiles                                     cloudnest  dev            amin     bicep
+afd-cloudnest-dev/fde-cloudnest-dev-nzeikn6cfy4zq                Microsoft.Cdn/profiles/afdendpoints                        cloudnest  dev            amin
+webapp-cloudnest-dev-baz6xqhbrtpb6                               Microsoft.Web/sites                                        cloudnest  dev            amin     bicep
+webapp-cloudnest-dev-baz6xqhbrtpb6/staging                       Microsoft.Web/sites/slots                                  cloudnest  dev            amin     bicep
+asp-cloudnest-dev-dr                                             Microsoft.Web/serverFarms                                  cloudnest  dev            amin     bicep
+webapp-cloudnest-dev-dr-2a2mwxpd6nkfm                            Microsoft.Web/sites                                        cloudnest  dev            amin     bicep
+pep-cloudnest-kv-dev                                             Microsoft.Network/privateEndpoints                         cloudnest  dev            amin     bicep
+privatelink.vaultcore.azure.net                                  Microsoft.Network/privateDnsZones                          cloudnest  dev            amin     bicep
+pep-cloudnest-kv-dev.nic.4bb28a91-78ca-452d-9489-31377ce69c83    Microsoft.Network/networkInterfaces                        cloudnest  dev            amin
+privatelink.vaultcore.azure.net/linkcloudnest-kv-dev             Microsoft.Network/privateDnsZones/virtualNetworkLinks      cloudnest  dev            amin
+wafcloudnestdev                                                  Microsoft.Network/frontdoorWebApplicationFirewallPolicies  cloudnest  dev            amin     bicep
+
+Validation completed successfully.
+==============================================
