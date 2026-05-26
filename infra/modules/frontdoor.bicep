@@ -10,12 +10,12 @@ var originGroupName = 'og-${projectName}-${environment}'
 var primaryOriginName = 'origin-primary-${environment}'
 var secondaryOriginName = 'origin-secondary-${environment}'
 var routeName = 'route-${projectName}-${environment}'
-var wafPolicyName = 'waf-${projectName}-${environment}'
+var wafPolicyName = 'waf${projectName}${environment}'
 var securityPolicyName = 'security-${projectName}-${environment}'
 
 // Standard Front Door WAF policy.
 // We use Standard to keep cost low for this learning/portfolio project.
-/*resource wafPolicy 'Microsoft.Network/frontDoorWebApplicationFirewallPolicies@2020-11-01' = {
+resource wafPolicy 'Microsoft.Network/frontDoorWebApplicationFirewallPolicies@2020-11-01' = {
   name: wafPolicyName
   location: 'global'
   sku: {
@@ -34,7 +34,7 @@ var securityPolicyName = 'security-${projectName}-${environment}'
     // For production later:
     // 1. Change both SKUs to 'Premium_AzureFrontDoor'
     // 2. Replace customRules with managedRules.
-    
+   /*
     managedRules: {
       managedRuleSets: [
         {
@@ -44,7 +44,7 @@ var securityPolicyName = 'security-${projectName}-${environment}'
         }
       ]
     }
-    
+    */
 
     // Standard-friendly custom WAF rule.
     customRules: {
@@ -75,8 +75,35 @@ var securityPolicyName = 'security-${projectName}-${environment}'
     }
   }
   tags: tags
-}*/
-
+}
+resource securityPolicy 'Microsoft.Cdn/profiles/securityPolicies@2021-06-01' = {
+  name: securityPolicyName
+  parent: frontDoorProfile
+  dependsOn: [
+    route
+    wafPolicy
+  ]
+  properties: {
+    parameters: {
+      type: 'WebApplicationFirewall'
+      wafPolicy: {
+        id: wafPolicy.id
+      }
+      associations: [
+        {
+          domains: [
+            {
+              id: frontDoorEndpoint.id
+            }
+          ]
+          patternsToMatch: [
+            '/*'
+          ]
+        }
+      ]
+    }
+  }
+}
 resource frontDoorProfile 'Microsoft.Cdn/profiles@2021-06-01' = {
   name: frontDoorProfileName
   location: 'global'
@@ -193,4 +220,4 @@ resource route 'Microsoft.Cdn/profiles/afdEndpoints/routes@2021-06-01' = {
 
 output frontDoorProfileName string = frontDoorProfile.name
 output frontDoorEndpointHostName string = frontDoorEndpoint.properties.hostName
-//output wafPolicyName string = wafPolicy.name
+output wafPolicyName string = wafPolicy.name
