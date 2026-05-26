@@ -3,10 +3,11 @@ param location string
 param environment string
 param tags object
 param subNetId string
-param storageAccountName string
 param appInsightsConnectionString string
 param nameSuffix string = ''
 param keyVaultName string
+param appDataStorageAccountName string
+param appDataContainerName string
 
 var appServicePlanName = 'asp-${projectname}-${environment}${nameSuffix}'
 var webAppName = 'webapp-${projectname}-${environment}${nameSuffix}-${uniqueString(resourceGroup().id, location)}'
@@ -63,10 +64,7 @@ resource webApp 'Microsoft.Web/sites@2025-03-01'= {
     name: 'APP_SECRET'
     value: '@Microsoft.KeyVault(SecretUri=https://${keyVaultName}.vault.azure.net/secrets/app-secret/)'
   }
-  {
-    name: 'STORAGE_ACCOUNT_NAME'
-    value: storageAccountName
-  }
+ 
   {
     name: 'WEBSITE_VNET_ROUTE_ALL'
     value: '1'
@@ -79,6 +77,14 @@ resource webApp 'Microsoft.Web/sites@2025-03-01'= {
     name: 'ApplicationInsightsAgent_EXTENSION_VERSION'
     value: '~3'
   }
+  {
+    name: 'APP_DATA_STORAGE_ACCOUNT_NAME'
+    value: appDataStorageAccountName
+  }
+  {
+    name: 'APP_DATA_CONTAINER_NAME'
+    value: appDataContainerName
+  }
 ]
     }
   }
@@ -90,4 +96,5 @@ output webAppName string = webApp.name
 output webAppId string = webApp.id
 output webAppDefaultHostNAme string = webApp.properties.defaultHostName
 output webAppPrincipalId string = webApp.identity.principalId
+
 

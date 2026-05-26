@@ -54,6 +54,12 @@ resource uploadsContainer 'Microsoft.Storage/storageAccounts/blobServices/contai
     publicAccess:'None'
   }
 }
+resource appDataContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-05-01' = {
+  name: '${storaegAccount.name}/default/app-data'
+  properties: {
+    publicAccess: 'None'
+  }
+}
 
 resource fileService 'Microsoft.Storage/storageAccounts/fileServices@2026-04-01'= {
   parent:storaegAccount
@@ -105,5 +111,4 @@ output storageAccountId string = storaegAccount.id
 output uploadsContainerName string = uploadsContainer.name
 
 output fileShareName string = sharedFIleShare.name
-
-
+output appDataContainerName string = appDataContainer.name

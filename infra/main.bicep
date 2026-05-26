@@ -58,10 +58,15 @@ module appServiceModule './modules/app-service.bicep'= {
     tags: tags
     environment: environment
     projectname: projectName
-    storageAccountName: storageModule.outputs.storageAccountName
+    //storageAccountName: storageModule.outputs.storageAccountName
     subNetId: networkModule.outputs.subnetAppId
+
     appInsightsConnectionString:appInsightsModule.outputs.connectionString
     keyVaultName: keyVaultModule.outputs.keyVaultName
+
+    //storageAccountName: storageModule.outputs.storageAccountName
+    appDataStorageAccountName: storageModule.outputs.storageAccountName
+    appDataContainerName: 'app-data'
   }
 }
 module appServiceDrModule './modules/app-service.bicep'= {
@@ -72,12 +77,14 @@ module appServiceDrModule './modules/app-service.bicep'= {
     environment: environment
     projectname: projectName
     keyVaultName: keyVaultModule.outputs.keyVaultName
-    
+    //storageAccountName: storageModule.outputs.storageAccountName
+     appDataStorageAccountName: storageModule.outputs.storageAccountName
+     appDataContainerName: 'app-data'
     
 
     nameSuffix: '-dr'
 
-    storageAccountName: storageModule.outputs.storageAccountName
+    //storageAccountName: storageModule.outputs.storageAccountName
     //subNetId: networkModule.outputs.subnetAppId
     subNetId: ''
     appInsightsConnectionString: appInsightsModule.outputs.connectionString
@@ -173,6 +180,13 @@ module policyModule './modules/policy.bicep'= {
   name:'policy-deployment-${environment}'
   params: {
     environment: environment
+  }
+}
+module storageRbacModule './modules/storage-rbac.bicep' = {
+  name: 'storage-rbac-${environment}'
+  params: {
+    storageAccountName: storageModule.outputs.storageAccountName
+    principalId: appServiceModule.outputs.webAppPrincipalId
   }
 }
 
