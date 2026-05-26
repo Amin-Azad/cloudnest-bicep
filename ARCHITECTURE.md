@@ -84,6 +84,7 @@ Storage services are protected using Private Endpoints and Private DNS Zones. Mo
 5. Storage access is secured through Private Endpoints and Private DNS.
 6. Logs and telemetry are collected in Application Insights and Log Analytics.
 7. Alerts and Workbooks provide operational visibility.
+8. Deployment slots are used to support staging and safer production release workflows. Application changes can be validated in the staging slot before being swapped into production.
 
 ## Architecture Decisions
 
