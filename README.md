@@ -1,36 +1,61 @@
 # CloudNest - Azure Infrastructure Platform with Bicep
 
-CloudNest is a production-style Azure infrastructure project built using Infrastructure as Code (IaC) with Bicep.
+CloudNest is a production-style Azure infrastructure platform built using Infrastructure as Code (IaC) with Bicep.
 
 The project demonstrates how modern Azure environments can be designed, automated, secured, monitored, and governed using Azure-native services and DevOps practices.
 
+CloudNest was built as a hands-on cloud engineering portfolio project focused on real operational concepts rather than simple Azure resource deployment.
+
 ---
 
-# Architecture Overview
+# Project Goal
+
+The goal of CloudNest is to simulate a realistic Azure cloud environment using:
+
+- Infrastructure as Code
+- secure networking
+- identity-based security
+- monitoring and observability
+- CI/CD automation
+- governance and policy enforcement
+- autoscaling and operational practices
+- disaster recovery concepts
+
+The project focuses on operational maturity, automation, and Azure-native architecture patterns commonly used in real cloud environments.
+
+---
 
 # Architecture Overview
 
 CloudNest includes:
 
 - Azure Front Door with WAF
-- Azure App Service with deployment slots
-- Azure App Service deployment slots for staging and production workflows
-- Managed Identity and Azure Key Vault
-- Private Endpoints and Private DNS Zones
+- Azure App Service
+- Deployment Slots for staging and production workflows
+- Managed Identity authentication
+- Azure Key Vault
+- Private Endpoints
+- Private DNS Zones
 - Azure Monitor and Log Analytics
-- Azure Workbooks and Alerts
+- Azure Workbooks dashboards
+- Azure Monitor Alerts
 - GitHub Actions CI/CD
+- Azure Policy governance
 - Autoscaling
-- Backup and Disaster Recovery concepts
-- Azure Policy and Governance controls
+- Backup and disaster recovery concepts
 
 ---
 
 # Architecture Diagram
 
-See the full architecture design in:
+![CloudNest Architecture](./screenshots/architecture-diagram.png)
 
-[ARCHITECTURE.md](./ARCHITECTURE.md)
+Additional architecture details are available in:
+
+- [ARCHITECTURE.md](./ARCHITECTURE.md)
+- [SECURITY.md](./SECURITY.md)
+- [OPERATIONS.md](./OPERATIONS.md)
+- [GOVERNANCE.md](./GOVERNANCE.md)
 
 ---
 
@@ -41,12 +66,12 @@ See the full architecture design in:
 | Infrastructure as Code | Bicep |
 | Compute | Azure App Service |
 | Networking | VNet, Private Endpoints, Private DNS |
-| Security | Key Vault, Managed Identity, WAF |
+| Security | Azure Key Vault, Managed Identity, WAF |
 | Monitoring | Azure Monitor, Log Analytics, Application Insights |
 | DevOps | GitHub Actions |
 | Governance | Azure Policy |
-| Scalability | Autoscale |
-| Resilience | Backup and DR Design |
+| Scalability | Azure Autoscale |
+| Disaster Recovery | Front Door failover design |
 
 ---
 
@@ -57,14 +82,16 @@ See the full architecture design in:
 - Modular Bicep architecture
 - Reusable deployment modules
 - Automated Azure deployments
+- Centralized infrastructure management
 
 ## Security
 
 - Managed Identity authentication
 - Azure Key Vault integration
+- Azure Front Door WAF protection
 - Private Endpoints
+- Private DNS Zones
 - Zero-trust networking approach
-- Front Door WAF protection
 
 ## Monitoring and Operations
 
@@ -72,25 +99,31 @@ See the full architecture design in:
 - Application Insights telemetry
 - Log Analytics Workspace
 - Azure Workbooks dashboards
-- Operational monitoring
+- Operational monitoring and visibility
 
 ## CI/CD Automation
 
 - GitHub Actions deployment pipeline
 - OIDC federated authentication
 - Automated Bicep deployments
-- Deployment slot support for safer releases
+- Infrastructure validation workflow
 
-CloudNest uses Azure App Service deployment slots to support staging and production environments.
+## Deployment Slots
 
-The staging slot allows updates and validation before swapping changes into production, reducing deployment risk and downtime.
+CloudNest uses Azure App Service deployment slots to support staging and production workflows.
+
+The staging slot allows infrastructure and application changes to be validated before swapping into production.
+
+This helps reduce deployment risk and downtime.
 
 ## Governance and FinOps
 
 - Azure Policy enforcement
 - Required resource tagging
+- Policy remediation tasks
 - Cost optimization practices
 - Autoscaling configuration
+- Storage lifecycle management
 
 ---
 
@@ -103,7 +136,13 @@ cloudnest-bicep/
 │   ├── main.bicep
 │   └── modules/
 │
-├── screenshots/
+├── scripts/
+│   └── validate-cloudnest.sh
+│
+├── outputs/
+│   └── validation-output.txt
+│
+├── screenshots
 │
 ├── README.md
 ├── ARCHITECTURE.md
@@ -114,14 +153,83 @@ cloudnest-bicep/
 
 ---
 
-# Documentation
+# Quick Deployment
 
-| Document | Description |
+## Clone Repository
+
+```bash
+git clone https://github.com/Amin-Azad/cloudnest-bicep.git
+cd cloudnest-bicep
+```
+
+## Login to Azure
+
+```bash
+az login
+```
+
+## Create Resource Group
+
+```bash
+az group create \
+  --name rg-cloudnest-dev \
+  --location westeurope
+```
+
+## Deploy Infrastructure
+
+```bash
+az deployment group create \
+  --resource-group rg-cloudnest-dev \
+  --template-file infra/main.bicep
+```
+
+---
+
+# Infrastructure Validation
+
+CloudNest includes a validation script to verify deployed Azure resources and operational configuration.
+
+Run:
+
+```bash
+./scripts/validate-cloudnest.sh
+```
+
+Validation output is stored in:
+
+```text
+outputs/validation-output.txt
+```
+
+The validation process checks:
+
+- App Services
+- deployment slots
+- Front Door and WAF
+- autoscaling
+- alerts
+- private endpoints
+- Key Vault
+- Azure Policy
+- monitoring resources
+- disaster recovery configuration
+
+---
+
+# Platform Screenshots
+
+| Feature | Screenshot |
 |---|---|
-| ARCHITECTURE.md | Infrastructure and solution architecture |
-| SECURITY.md | Security and zero-trust implementation |
-| OPERATIONS.md | Monitoring, CI/CD, autoscaling, and DR |
-| GOVERNANCE.md | Governance, policies, and cost optimization |
+| Architecture Diagram | `screenshots/architecture-diagram.png` |
+| Front Door + WAF | `screenshots/frontdoor-waf.png` |
+| Deployment Slots | `screenshots/deployment-slots.png` |
+| Private Endpoints | `screenshots/private-endpoints.png` |
+| Azure Keyvaults | `screenshots/keyvault-reference.png` |
+| Azure Monitor Alerts | `screenshots/alerts.png` |
+| Autoscaling | `screenshots/autoscale.png` |
+| Azure Policy Compliance | `screenshots/policy-compliance.png` |
+| GitHub Actions Pipeline | `screenshots/github-actions.png` |
 
 ---
 
@@ -132,22 +240,11 @@ CloudNest simulates production-style Azure operational practices including:
 - monitoring and observability
 - deployment automation
 - secure networking
-- governance enforcement
-- scalability planning
-- disaster recovery concepts
-
----
-
-# Future Improvements
-
-Future enhancements may include:
-
-- Terraform implementation
-- AKS migration
-- Blue/Green deployments
-- Azure Defender integration
-- Multi-region failover
-- Advanced policy enforcement
+- policy enforcement
+- autoscaling
+- disaster recovery planning
+- operational validation
+- centralized logging
 
 ---
 
@@ -159,8 +256,24 @@ This project helped strengthen practical experience with:
 - cloud networking
 - Azure security services
 - monitoring and observability
-- DevOps automation
-- governance and operational practices
+- GitHub Actions CI/CD
+- governance and policy management
+- Azure operational practices
+- disaster recovery concepts
+
+---
+
+# Future Improvements
+
+Future enhancements may include:
+
+- Terraform implementation
+- AKS migration
+- Blue/Green deployment workflows
+- Azure Defender integration
+- multi-region failover
+- advanced governance policies
+- Sentinel integration
 
 ---
 
@@ -168,4 +281,4 @@ This project helped strengthen practical experience with:
 
 Amin Azad
 
-Azure | Cloud | Infrastructure | DevOps Learning Project
+Azure | Cloud | Infrastructure | DevOps Portfolio Project
