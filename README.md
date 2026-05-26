@@ -48,7 +48,52 @@ CloudNest includes:
 
 # Architecture Diagram
 
-![CloudNest Architecture](./screenshots/architecture-diagram.png)
+<p align="center">
+
+
+```mermaid
+flowchart TD
+
+    %% External Access
+    A[Users / Internet Traffic] --> B[Azure Front Door + WAF]
+
+    %% Application Layer
+    B --> C[Azure App Service<br/>Primary Region: West Europe]
+    C --> D[Deployment Slot<br/>Staging Environment]
+    D --> C
+
+    C --> E[Managed Identity]
+
+    %% Security and Data Layer
+    E --> F[Azure Key Vault<br/>Secrets stored securely]
+    E --> G[Azure Storage Account<br/>Private access enabled]
+
+    G --> H[Private Endpoint]
+    H --> I[Private DNS Zone]
+
+    %% Monitoring Layer
+    C --> J[Application Insights]
+    J --> K[Log Analytics Workspace]
+    K --> L[Azure Monitor Alerts]
+    K --> M[Azure Workbooks]
+
+    %% CI/CD Layer
+    N[GitHub Repository] --> O[GitHub Actions CI/CD]
+    O --> P[Bicep Deployment]
+
+    P --> C
+    P --> F
+    P --> G
+    P --> K
+
+    %% Governance and Scaling
+    Q[Azure Policy / Governance] --> P
+    R[Autoscale Rules] --> C
+
+    %% Disaster Recovery
+    S[Secondary App Service<br/>DR Region: Sweden Central] --> B
+```
+</p>
 
 Additional architecture details are available in:
 
