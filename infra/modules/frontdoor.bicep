@@ -27,10 +27,7 @@ resource wafPolicy 'Microsoft.Network/frontDoorWebApplicationFirewallPolicies@20
       mode: 'Prevention'
     }
 
-    // Premium version note:
-    // Managed OWASP rules require Azure Front Door Premium.
-    // Premium is much more expensive, so we are NOT using it now.
-    //
+    // Premium version note. Managed OWASP rules require Azure Front Door Premium.Premium is much more expensive, so we are NOT using it now.
     // For production later:
     // 1. Change both SKUs to 'Premium_AzureFrontDoor'
     // 2. Replace customRules with managedRules.
@@ -190,33 +187,6 @@ resource route 'Microsoft.Cdn/profiles/afdEndpoints/routes@2021-06-01' = {
   }
 }
 
-/*resource securityPolicy 'Microsoft.Cdn/profiles/securityPolicies@2021-06-01' = {
-  name: securityPolicyName
-  parent: frontDoorProfile
-  dependsOn: [
-    route
-  ]
-  properties: {
-    parameters: {
-      type: 'WebApplicationFirewall'
-      wafPolicy: {
-        id: wafPolicy.id
-      }
-      associations: [
-        {
-          domains: [
-            {
-              id: frontDoorEndpoint.id
-            }
-          ]
-          patternsToMatch: [
-            '/*'
-          ]
-        }
-      ]
-    }
-  }
-}*/
 
 output frontDoorProfileName string = frontDoorProfile.name
 output frontDoorEndpointHostName string = frontDoorEndpoint.properties.hostName
