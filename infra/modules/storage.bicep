@@ -68,6 +68,37 @@ resource sharedFIleShare 'Microsoft.Storage/storageAccounts/fileServices/shares@
     shareQuota: 100
   }
 }
+resource lifecyclePolicy 'Microsoft.Storage/storageAccounts/managementPolicies@2023-05-01' = {
+  name: '${storaegAccount.name}/default'
+  properties: {
+    policy: {
+      rules: [
+        {
+          enabled: true
+          name: 'blob-lifecycle-cost-optimization'
+          type: 'Lifecycle'
+          definition: {
+            filters: {
+              blobTypes: [
+                'blockBlob'
+              ]
+            }
+            actions: {
+              baseBlob: {
+                tierToCool: {
+                  daysAfterModificationGreaterThan: 30
+                }
+                tierToArchive: {
+                  daysAfterModificationGreaterThan: 90
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}
 
 output storageAccountName string = storaegAccount.name
 output storageAccountId string = storaegAccount.id
