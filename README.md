@@ -2,7 +2,8 @@
 
 CloudNest is a production-style Azure infrastructure platform built using Infrastructure as Code (IaC) with Bicep.
 
-The project demonstrates how modern Azure environments can be designed, automated, secured, monitored, and governed using Azure-native services and DevOps practices.
+The project demonstrates how modern Azure environments can be designed, automated, secured, monitored, and governed using Azure-native services and DevOps practices. 
+
 
 CloudNest was built as a hands-on cloud engineering portfolio project focused on real operational concepts rather than simple Azure resource deployment.
 
@@ -23,6 +24,9 @@ The goal of CloudNest is to simulate a realistic Azure cloud environment using:
 
 The project focuses on operational maturity, automation, and Azure-native architecture patterns commonly used in real cloud environments.
 
+```markdown
+The project also incorporates FinOps and cost-optimization practices suitable for learning and development environments.
+```
 ---
 
 # Architecture Overview
@@ -47,9 +51,6 @@ CloudNest includes:
 ---
 
 # Architecture Diagram
-
-<p align="center">
-
 
 ```mermaid
 flowchart TD
@@ -92,9 +93,8 @@ flowchart TD
 
     %% Disaster Recovery
     S[Secondary App Service<br/>DR Region: Sweden Central] --> B
+    
 ```
-</p>
-
 Additional architecture details are available in:
 
 - [ARCHITECTURE.md](./ARCHITECTURE.md)
@@ -216,7 +216,7 @@ Deploy App to Staging
     ↓
 Slot Swap to Production
 ```
-## Phase 19 — Azure Storage Integration
+## Azure Storage Integration
 
 CloudNest was extended with Azure Blob Storage integration to demonstrate secure application-to-storage communication.
 
@@ -231,7 +231,7 @@ The App Service uses a system-assigned Managed Identity to access the Storage Ac
 - Runtime `/storage-check` endpoint
 - Blob write/read validation from the running application
 
-### Security Model
+## Security Model
 
 The application does not use storage account keys or hardcoded secrets.
 
@@ -241,6 +241,7 @@ Instead, access is granted using Azure RBAC:
 - `Storage Blob Data Contributor`
 
 assigned to the App Service managed identity.
+
 
 ### Validation
 
@@ -257,7 +258,7 @@ The endpoint successfully wrote and read a blob from Azure Storage:
   "contentMatches": true
 }
 ```
-### Azure SQL Database Foundation
+## Azure SQL Database Foundation
 
 Azure SQL Database was introduced as the relational data layer for CloudNest.
 
@@ -268,13 +269,25 @@ Implemented:
 - Application endpoint planned for database connectivity testing
 
 Current status:
-- SQL infrastructure foundation completed
-- Full application-level SQL query integration deferred to a future improvement phase
+- Azure SQL infrastructure successfully provisioned
+- Application-level SQL query integration intentionally postponed for a future enhancement phase
 
 Reason:
 The main portfolio focus is infrastructure automation, secure cloud architecture, monitoring, CI/CD, networking, governance, and resilience.
 
-### Live Application Features
+
+## Security Principles
+
+CloudNest follows several Azure security best practices:
+
+- Least-privilege RBAC access
+- Managed Identity over secrets
+- Private Endpoint connectivity
+- Zero-trust networking principles
+- WAF protection at the edge
+- Secret management through Azure Key Vault
+  
+## Live Application Features
 
 The sample Node.js application demonstrates:
 
@@ -325,8 +338,7 @@ cloudnest-bicep/
 ├── src/
 │   ├── app.js
 │   ├── package.json
-│   ├── package-lock.json
-│   └── node_modules/
+│   └── package-lock.json
 │
 ├── ARCHITECTURE.md
 ├── GOVERNANCE.md
@@ -393,6 +405,7 @@ Run:
 
 ```bash
 ./scripts/validate-cloudnest.sh
+
 ```
 
 Validation output is stored in:
@@ -414,6 +427,16 @@ The validation process checks:
 - monitoring resources
 - disaster recovery configuration
 
+# Cleanup
+
+To avoid Azure costs, delete the resource group after testing:
+
+```bash
+az group delete \
+  --name rg-cloudnest-dev \
+  --yes \
+  --no-wait
+```
 ---
 
 # Platform Screenshots
@@ -473,6 +496,8 @@ Future enhancements may include:
 - multi-region failover
 - advanced governance policies
 - Sentinel integration
+- Custom domain integration with Azure Front Door
+- Full Azure SQL application integration
 
 ---
 
