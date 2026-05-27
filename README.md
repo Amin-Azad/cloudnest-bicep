@@ -257,7 +257,7 @@ The endpoint successfully wrote and read a blob from Azure Storage:
   "contentMatches": true
 }
 ```
-### Phase 20A – Azure SQL Database Foundation
+### Azure SQL Database Foundation
 
 Azure SQL Database was introduced as the relational data layer for CloudNest.
 
@@ -369,7 +369,22 @@ az deployment group create \
 ```
 
 ---
+## Required Azure Permissions
 
+To deploy this project, the user/service principal needs:
+
+- Contributor on the target Resource Group or Subscription
+- User Access Administrator or Owner for role assignments
+- Key Vault Administrator or Key Vault Secrets Officer
+- Storage Blob Data Contributor for storage testing
+- Monitoring Contributor for alerts, workbooks, and diagnostics
+- Network Contributor for VNets, private endpoints, DNS, Front Door, and WAF
+- SQL Server Contributor / SQL DB Contributor for Azure SQL resources
+
+For GitHub Actions OIDC deployment:
+- Federated credential configured on the Entra ID app registration
+- Contributor role assigned to the service principal at resource group scope
+---
 # Infrastructure Validation
 
 CloudNest includes a validation script to verify deployed Azure resources and operational configuration.
