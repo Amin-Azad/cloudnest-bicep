@@ -216,6 +216,63 @@ Deploy App to Staging
     ↓
 Slot Swap to Production
 ```
+## Phase 19 — Azure Storage Integration
+
+CloudNest was extended with Azure Blob Storage integration to demonstrate secure application-to-storage communication.
+
+The App Service uses a system-assigned Managed Identity to access the Storage Account without using storage keys or connection strings.
+
+### What was implemented
+
+- Azure Blob Storage container for application data
+- App Service application settings for storage configuration
+- System-assigned Managed Identity on the Web App
+- RBAC-based access to Blob Storage
+- Runtime `/storage-check` endpoint
+- Blob write/read validation from the running application
+
+### Security Model
+
+The application does not use storage account keys or hardcoded secrets.
+
+Instead, access is granted using Azure RBAC:
+
+- `Storage Blob Data Reader`
+- `Storage Blob Data Contributor`
+
+assigned to the App Service managed identity.
+
+### Validation
+
+The storage integration was validated using the application endpoint:
+
+```bash
+curl https://webapp-cloudnest-dev-baz6xqhbrtpb6.azurewebsites.net/storage-check
+```
+The endpoint successfully wrote and read a blob from Azure Storage:
+```json
+{
+  "status": "success",
+  "message": "App successfully wrote and read a blob using Managed Identity",
+  "contentMatches": true
+}
+```
+### Phase 20A – Azure SQL Database Foundation
+
+Azure SQL Database was introduced as the relational data layer for CloudNest.
+
+Implemented:
+- Azure SQL Server
+- Azure SQL Database
+- SQL configuration prepared for App Service integration
+- Application endpoint planned for database connectivity testing
+
+Current status:
+- SQL infrastructure foundation completed
+- Full application-level SQL query integration deferred to a future improvement phase
+
+Reason:
+The main portfolio focus is infrastructure automation, secure cloud architecture, monitoring, CI/CD, networking, governance, and resilience.
 
 ### Live Application Features
 

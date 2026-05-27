@@ -11,6 +11,10 @@ Thumbs.db
 # VS Code
 .vscode/
 
+node_modules/
+app.zip
+.env
+
 # Terraform
 *.tfstate
 *.tfstate.*

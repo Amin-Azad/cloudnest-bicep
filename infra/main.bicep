@@ -5,7 +5,12 @@ param location string = resourceGroup().location
 param environment string = 'dev'
 param actionGroupEmail string = 'aminazad079@gmail.com'
 
+param sqlAdminLogin string = 'sqladminuser'
 
+@secure()
+param sqlAdminPassword string
+
+var sqlConnectionString = 'Server=tcp:${sqlModule.outputs.sqlServerFqdn},1433;Initial Catalog=${sqlModule.outputs.sqlDatabaseName};Persist Security Info=False;User ID=${sqlAdminLogin};Password=${sqlAdminPassword};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;'
 
 var tags = {
   project: projectName
@@ -67,6 +72,8 @@ module appServiceModule './modules/app-service.bicep'= {
     //storageAccountName: storageModule.outputs.storageAccountName
     appDataStorageAccountName: storageModule.outputs.storageAccountName
     appDataContainerName: 'app-data'
+
+    sqlConnectionString: sqlConnectionString
   }
 }
 module appServiceDrModule './modules/app-service.bicep'= {
@@ -88,6 +95,7 @@ module appServiceDrModule './modules/app-service.bicep'= {
     //subNetId: networkModule.outputs.subnetAppId
     subNetId: ''
     appInsightsConnectionString: appInsightsModule.outputs.connectionString
+    sqlConnectionString:sqlConnectionString
   }
 }
 module frontDoorModule './modules/frontdoor.bicep' = {
@@ -189,6 +197,17 @@ module storageRbacModule './modules/storage-rbac.bicep' = {
     principalId: appServiceModule.outputs.webAppPrincipalId
   }
 }
+module sqlModule './modules/sql.bicep' = {
+  name: 'sql-deployment-${environment}'
+  params: {
+    location: location
+    environment: environment
+    projectName: projectName
+    tags: tags
+    sqlAdminLogin: sqlAdminLogin
+    sqlAdminPassword: sqlAdminPassword
+  }
+}
 
 output vnetName string = networkModule.outputs.vnetName 
 output vnetId string = networkModule.outputs.vnetId
@@ -217,4 +236,8 @@ output appInsightsId string = appInsightsModule.outputs.appInsightId
 
 output keyVaultName string = keyVaultModule.outputs.keyVaultName
 output keyVaultUri string = keyVaultModule.outputs.keyVaultUri
+
+output sqlServerName string = sqlModule.outputs.sqlServerName
+output sqlServerFqdn string = sqlModule.outputs.sqlServerFqdn
+output sqlDatabaseName string = sqlModule.outputs.sqlDatabaseName
 

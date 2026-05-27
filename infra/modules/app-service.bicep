@@ -8,6 +8,8 @@ param nameSuffix string = ''
 param keyVaultName string
 param appDataStorageAccountName string
 param appDataContainerName string
+@secure()
+param sqlConnectionString string
 
 var appServicePlanName = 'asp-${projectname}-${environment}${nameSuffix}'
 var webAppName = 'webapp-${projectname}-${environment}${nameSuffix}-${uniqueString(resourceGroup().id, location)}'
@@ -85,6 +87,10 @@ resource webApp 'Microsoft.Web/sites@2025-03-01'= {
     name: 'APP_DATA_CONTAINER_NAME'
     value: appDataContainerName
   }
+  {
+    name: 'SQL_CONNECTION_STRING'
+    value: sqlConnectionString
+}
 ]
     }
   }
