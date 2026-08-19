@@ -6,19 +6,18 @@ param webAppId string
 param appServicePlanId string
 param actionGroupEmail string
 
-resource actionGroup 'Microsoft.Insights/actionGroups@2023-01-01'= {
+resource actionGroup 'Microsoft.Insights/actionGroups@2023-01-01' = {
   name: 'ag-${projectName}-${environment}'
-  location: 'Global' 
-  tags:tags
-  properties:{
-    groupShortName:'cloudNest'
-    enabled:true
-    emailReceivers:[
+  location: 'Global'
+  tags: tags
+  properties: {
+    groupShortName: 'cloudNest'
+    enabled: true
+    emailReceivers: [
       {
-        name:'AdminEmail'
-        emailAddress:actionGroupEmail
-        useCommonAlertSchema:true
-
+        name: 'AdminEmail'
+        emailAddress: actionGroupEmail
+        useCommonAlertSchema: true
       }
     ]
   }
@@ -97,3 +96,4 @@ resource http5xxAlert 'Microsoft.Insights/metricAlerts@2018-03-01' = {
 output actionGroupName string = actionGroup.name
 output highCpuAlertName string = highCpuAlert.name
 output http5xxAlertName string = http5xxAlert.name
+

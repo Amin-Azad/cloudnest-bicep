@@ -1,5 +1,7 @@
 # Cost Optimization & FinOps
 
+> Historical working note: this file describes the first deployment. Current cost, budget and cleanup evidence will be recorded during the rebuild.
+
 ## Objective
 
 Implement operational cost optimization and FinOps controls for the CloudNest platform.

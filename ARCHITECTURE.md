@@ -1,5 +1,7 @@
 # CloudNest Azure Infrastructure Architecture
 
+> Historical working note: this file describes the first implementation. It is not a claim that the current target architecture has been fully implemented or revalidated. It will be rewritten after the rebuild deployment and evidence review.
+
 CloudNest is a production-style Azure infrastructure project built with Bicep. The goal of this project is to demonstrate how cloud infrastructure can be designed, deployed, secured, monitored, and governed using Infrastructure as Code.
 
 ## Architecture Diagram

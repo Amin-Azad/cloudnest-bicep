@@ -152,3 +152,4 @@ resource inheritOwnerTagAssignment 'Microsoft.Authorization/policyAssignments@20
     }
   }
 }
+

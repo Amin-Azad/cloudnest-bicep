@@ -1,5 +1,7 @@
 # Application CI/CD Pipeline
 
+> Historical working note: the workflow described here was removed because it deployed automatically from `main` and used a generated App Service name. A guarded staging deployment will replace it during the rebuild.
+
 ## Goal
 
 Deploy a real application to Azure App Service using GitHub Actions CI/CD.

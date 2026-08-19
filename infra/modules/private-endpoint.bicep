@@ -17,47 +17,47 @@ var keyVaultPrivateEndpointName = 'pep-${projectName}-kv-${environment}'
 var blobPrivateEndpointName = 'pep-${projectName}-blob-${environment}'
 var fileprivateEndpointName = 'pep-${projectName}-file-${environment}'
 
-resource blobPrivateDnsZone 'Microsoft.Network/privateDnsZones@2024-06-01'= {
+resource blobPrivateDnsZone 'Microsoft.Network/privateDnsZones@2024-06-01' = {
   name: blobPrivateDnsZoneName
-  location:'global'
-  tags:tags
+  location: 'global'
+  tags: tags
 }
-resource filePrivateDnsZone 'Microsoft.Network/privateDnsZones@2024-06-01'= {
+resource filePrivateDnsZone 'Microsoft.Network/privateDnsZones@2024-06-01' = {
   name: filePrivateDnsZoneName
-  location:'global'
-  tags:tags
+  location: 'global'
+  tags: tags
 }
 resource keyVaultPrivateDnsZone 'Microsoft.Network/privateDnsZones@2024-06-01' = {
   name: keyVaultPrivateDnsZoneName
   location: 'global'
   tags: tags
 }
-resource blobDnsZoneLink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2024-06-01'= {
+resource blobDnsZoneLink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2024-06-01' = {
   name: 'link${projectName}-blob-${environment}'
-  parent:blobPrivateDnsZone
-  location:'global'
+  parent: blobPrivateDnsZone
+  location: 'global'
 
-  properties:{
-    registrationEnabled:false
+  properties: {
+    registrationEnabled: false
 
-  virtualNetwork:{
-    id:vnetId
+    virtualNetwork: {
+      id: vnetId
     }
   }
 }
 
-resource fileDnsVnetLink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2024-06-01'= {
-  parent:filePrivateDnsZone
+resource fileDnsVnetLink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2024-06-01' = {
+  parent: filePrivateDnsZone
   name: 'link${projectName}-file-${environment}'
-  location:'global'
-  
-  properties:{
-    registrationEnabled:false
+  location: 'global'
 
-    virtualNetwork:{  
-      id:vnetId
-      }
+  properties: {
+    registrationEnabled: false
+
+    virtualNetwork: {
+      id: vnetId
     }
+  }
 }
 resource keyVaultDnsVnetLink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2024-06-01' = {
   parent: keyVaultPrivateDnsZone
@@ -78,7 +78,7 @@ resource blobPrivateEndpoint 'Microsoft.Network/privateEndpoints@2025-05-01' = {
 
   properties: {
     subnet: {
-      id:subnetPrivateid
+      id: subnetPrivateid
     }
 
     privateLinkServiceConnections: [
@@ -194,3 +194,4 @@ output filePrivateDnsZoneName string = filePrivateDnsZone.name
 
 output keyVaultPrivateEndpointName string = keyVaultPrivateEndpoint.name
 output keyVaultPrivateDnsZoneName string = keyVaultPrivateDnsZone.name
+

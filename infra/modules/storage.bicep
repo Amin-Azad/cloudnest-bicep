@@ -7,51 +7,50 @@ var storageAccountName = toLower('st${environment}${uniqueString(resourceGroup()
 var containerName = 'uploads'
 var fileShareName = 'sharedfiles'
 
-resource storaegAccount 'Microsoft.Storage/storageAccounts@2026-04-01'= {
+resource storaegAccount 'Microsoft.Storage/storageAccounts@2026-04-01' = {
   name: storageAccountName
-  location:location 
-  tags:tags
+  location: location
+  tags: tags
 
   sku: {
     name: 'Standard_LRS'
   }
 
-  kind:'StorageV2'
-  properties:{
-    accessTier:'Hot'
+  kind: 'StorageV2'
+  properties: {
+    accessTier: 'Hot'
     minimumTlsVersion: 'TLS1_2'
     allowBlobPublicAccess: false
     supportsHttpsTrafficOnly: true
 
     publicNetworkAccess: 'Disabled'
     networkAcls: {
-    defaultAction: 'Deny'
-    bypass: 'AzureServices'
+      defaultAction: 'Deny'
+      bypass: 'AzureServices'
     }
-
-  } 
-}
-resource blobService 'Microsoft.Storage/storageAccounts/blobServices@2026-04-01'= {
-  parent:storaegAccount
-  name: 'default'
-
-  properties:{
-    deleteRetentionPolicy:{
-      enabled:true
-      days:14
-    }
-    containerDeleteRetentionPolicy:{
-      enabled:true
-      days:14
-    }
-    isVersioningEnabled:true
   }
 }
-resource uploadsContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2026-04-01'= {
-  parent:blobService
-  name:containerName
-  properties:{
-    publicAccess:'None'
+resource blobService 'Microsoft.Storage/storageAccounts/blobServices@2026-04-01' = {
+  parent: storaegAccount
+  name: 'default'
+
+  properties: {
+    deleteRetentionPolicy: {
+      enabled: true
+      days: 14
+    }
+    containerDeleteRetentionPolicy: {
+      enabled: true
+      days: 14
+    }
+    isVersioningEnabled: true
+  }
+}
+resource uploadsContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2026-04-01' = {
+  parent: blobService
+  name: containerName
+  properties: {
+    publicAccess: 'None'
   }
 }
 resource appDataContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-05-01' = {
@@ -61,15 +60,15 @@ resource appDataContainer 'Microsoft.Storage/storageAccounts/blobServices/contai
   }
 }
 
-resource fileService 'Microsoft.Storage/storageAccounts/fileServices@2026-04-01'= {
-  parent:storaegAccount
-  name:'default'
+resource fileService 'Microsoft.Storage/storageAccounts/fileServices@2026-04-01' = {
+  parent: storaegAccount
+  name: 'default'
 }
 
-resource sharedFIleShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2026-04-01'= {
+resource sharedFIleShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2026-04-01' = {
   name: fileShareName
-  parent:fileService
-  properties:{
+  parent: fileService
+  properties: {
     accessTier: 'TransactionOptimized'
     shareQuota: 100
   }
@@ -112,3 +111,4 @@ output uploadsContainerName string = uploadsContainer.name
 
 output fileShareName string = sharedFIleShare.name
 output appDataContainerName string = appDataContainer.name
+

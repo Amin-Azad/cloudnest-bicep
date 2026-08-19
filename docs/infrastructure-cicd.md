@@ -1,5 +1,7 @@
 # Infrastructure CI/CD Pipeline
 
+> Historical working note: the deployment workflow described here was removed because it could deploy on a push to `main`. The repository currently runs credential-free validation only; guarded What-If, deployment and cleanup workflows are planned.
+
 ## Goal
 
 Automate Azure infrastructure deployments using GitHub Actions and Bicep.
