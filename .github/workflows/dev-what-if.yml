@@ -1,0 +1,70 @@
+name: Dev What-If
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_what_if:
+        description: Run Azure What-If after readiness passes
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: cloudnest-dev-what-if
+  cancel-in-progress: false
+
+jobs:
+  readiness:
+    name: Dev readiness and What-If
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    environment:
+      name: dev
+
+    env:
+      CLOUDNEST_ACTION_GROUP_EMAIL: ${{ vars.CLOUDNEST_ACTION_GROUP_EMAIL }}
+      CLOUDNEST_SQL_ADMIN_PASSWORD: ${{ secrets.CLOUDNEST_SQL_ADMIN_PASSWORD }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+      - name: Install Bicep
+        run: az bicep install --version v0.46.1
+
+      - name: Sign in to Azure
+        uses: azure/login@532459ea530d8321f2fb9bb10d1e0bcf23869a43 # v3.0.0
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Run dev readiness checks
+        run: ./scripts/check-dev-readiness.sh
+
+      - name: Check What-If prerequisites
+        if: ${{ inputs.run_what_if }}
+        run: |
+          if ! az group show \
+            --name rg-cloudnest-dev \
+            --output none 2>/dev/null; then
+            echo "ERROR: rg-cloudnest-dev does not exist."
+            echo "What-If remains disabled until the deployment scope and permissions are prepared."
+            exit 1
+          fi
+
+      - name: Run Azure What-If
+        if: ${{ inputs.run_what_if }}
+        run: |
+          echo "Readiness passed. Running Azure What-If."
+
+          az deployment group what-if \
+            --resource-group rg-cloudnest-dev \
+            --template-file infra/main.bicep \
+            --parameters infra/environments/dev/main.bicepparam \
+            --result-format FullResourcePayloads
