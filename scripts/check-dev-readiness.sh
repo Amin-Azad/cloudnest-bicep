@@ -104,6 +104,7 @@ providers=(
   Microsoft.Storage
   Microsoft.KeyVault
   Microsoft.Insights
+  Microsoft.Cdn
 )
 
 echo "Checking resource providers..."
@@ -126,14 +127,20 @@ done
 
 echo
 
-check_region() {
+check_app_service_region() {
   local region="$1"
   local label="$2"
+  local required_instances="$3"
   local failed=0
 
-  echo "Checking $label region: $region"
+  echo "Checking $label App Service capacity: $region"
+  echo "  Required instances: $required_instances"
 
   local sku_limit
+  local sku_used
+  local total_limit
+  local total_used
+
   sku_limit="$(
     az rest \
       --method get \
@@ -142,7 +149,14 @@ check_region() {
       --output tsv
   )"
 
-  local total_limit
+  sku_used="$(
+    az rest \
+      --method get \
+      --url "https://management.azure.com/subscriptions/${subscription_id}/providers/Microsoft.Web/locations/${region}/usages?api-version=${APP_SERVICE_API_VERSION}" \
+      --query "value[?name.localizedValue=='${app_service_sku} VMs'].currentValue | [0]" \
+      --output tsv
+  )"
+
   total_limit="$(
     az rest \
       --method get \
@@ -151,49 +165,74 @@ check_region() {
       --output tsv
   )"
 
-  sku_limit="${sku_limit:-0}"
-  total_limit="${total_limit:-0}"
-
-  echo "  ${app_service_sku} VM limit: $sku_limit"
-  echo "  Total Regional VM limit: $total_limit"
-
-  if (( sku_limit < 1 )); then
-    echo "ERROR: $app_service_sku quota is unavailable in $region."
-    failed=1
-  fi
-
-  if (( total_limit < 1 )); then
-    echo "ERROR: Total Regional VMs quota is unavailable in $region."
-    failed=1
-  fi
-
-  local sql_available
-  sql_available="$(
-    az sql db list-editions \
-      --location "$region" \
-      --query "[?name=='${sql_sku}'].name | [0]" \
+  total_used="$(
+    az rest \
+      --method get \
+      --url "https://management.azure.com/subscriptions/${subscription_id}/providers/Microsoft.Web/locations/${region}/usages?api-version=${APP_SERVICE_API_VERSION}" \
+      --query "value[?name.localizedValue=='Total Regional VMs'].currentValue | [0]" \
       --output tsv
   )"
 
-  if [[ "$sql_available" != "$sql_sku" ]]; then
-    echo "ERROR: Azure SQL $sql_sku is unavailable in $region."
+  sku_limit="${sku_limit:-0}"
+  sku_used="${sku_used:-0}"
+  total_limit="${total_limit:-0}"
+  total_used="${total_used:-0}"
+
+  local sku_free=$((sku_limit - sku_used))
+  local total_free=$((total_limit - total_used))
+
+  echo "  ${app_service_sku} VMs: used=$sku_used limit=$sku_limit free=$sku_free"
+  echo "  Total Regional VMs: used=$total_used limit=$total_limit free=$total_free"
+
+  if (( sku_free < required_instances )); then
+    echo "ERROR: only $sku_free free $app_service_sku instances are available in $region; $required_instances required."
     failed=1
-  else
-    echo "  SQL $sql_sku: available"
+  fi
+
+  if (( total_free < required_instances )); then
+    echo "ERROR: only $total_free Total Regional VMs are free in $region; $required_instances required."
+    failed=1
   fi
 
   if (( failed != 0 )); then
     return 1
   fi
 
-  echo "OK: $label region passed."
+  echo "OK: $label App Service capacity passed."
+}
+
+check_primary_sql() {
+  echo "Checking primary SQL availability: $primary_region"
+
+  local sql_available
+  sql_available="$(
+    az sql db list-editions \
+      --location "$primary_region" \
+      --query "[?name=='${sql_sku}'].name | [0]" \
+      --output tsv
+  )"
+
+  if [[ "$sql_available" != "$sql_sku" ]]; then
+    echo "ERROR: Azure SQL $sql_sku is unavailable in $primary_region."
+    return 1
+  fi
+
+  echo "  SQL $sql_sku: available"
+  echo "OK: primary SQL availability passed."
 }
 
 readiness_failed=0
 
-check_region "$primary_region" "primary" || readiness_failed=1
+# Primary App Service autoscale permits up to two workers.
+check_app_service_region "$primary_region" "primary" 2 || readiness_failed=1
 echo
-check_region "$dr_region" "DR" || readiness_failed=1
+
+# DR App Service uses one worker.
+check_app_service_region "$dr_region" "DR" 1 || readiness_failed=1
+echo
+
+# SQL is deployed only in the primary region.
+check_primary_sql || readiness_failed=1
 
 echo
 
