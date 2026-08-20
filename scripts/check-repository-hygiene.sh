@@ -7,14 +7,14 @@ if ! command -v git >/dev/null 2>&1; then
   exit 1
 fi
 
-if ! command -v rg >/dev/null 2>&1; then
-  echo "ripgrep is required" >&2
+if ! command -v grep >/dev/null 2>&1; then
+  echo "grep is required" >&2
   exit 1
 fi
 
 tracked_files=()
 while IFS= read -r file; do
-  if [[ -f "$file" ]]; then
+  if [[ -f "$file" && "$file" != 'src/package-lock.json' ]]; then
     tracked_files+=("$file")
   fi
 done < <(git ls-files --cached --others --exclude-standard)
@@ -30,7 +30,7 @@ check_pattern() {
   local label="$1"
   local pattern="$2"
 
-  if rg --line-number --ignore-case --glob '!src/package-lock.json' "$pattern" "${tracked_files[@]}"; then
+  if grep -EInI -- "$pattern" "${tracked_files[@]}"; then
     echo "Repository hygiene check failed: $label" >&2
     failed=1
   fi
