@@ -48,3 +48,4 @@ output sqlServerId string = sqlServer.id
 output sqlServerName string = sqlServer.name
 output sqlServerFqdn string = sqlServer.properties.fullyQualifiedDomainName
 output sqlDatabaseName string = sqlDatabase.name
+

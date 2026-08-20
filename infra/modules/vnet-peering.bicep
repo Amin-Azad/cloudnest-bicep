@@ -38,3 +38,4 @@ resource drToPrimaryPeering 'Microsoft.Network/virtualNetworks/virtualNetworkPee
     useRemoteGateways: false
   }
 }
+

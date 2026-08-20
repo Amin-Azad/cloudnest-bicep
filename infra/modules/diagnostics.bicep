@@ -185,3 +185,4 @@ resource frontDoorDiagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-
     ]
   }
 }
+

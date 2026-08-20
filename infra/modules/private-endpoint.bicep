@@ -314,3 +314,4 @@ output blobPrivateDnsZoneName string = blobPrivateDnsZone.name
 output filePrivateDnsZoneName string = filePrivateDnsZone.name
 output keyVaultPrivateDnsZoneName string = keyVaultPrivateDnsZone.name
 output sqlPrivateDnsZoneName string = sqlPrivateDnsZone.name
+

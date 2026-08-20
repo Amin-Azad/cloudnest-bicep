@@ -177,3 +177,4 @@ output frontDoorEndpointHostName string = frontDoorEndpoint.properties.hostName
 output wafPolicyName string = wafPolicy.name
 
 output frontDoorId string = frontDoorProfile.properties.frontDoorId
+
