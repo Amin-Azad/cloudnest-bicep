@@ -104,6 +104,7 @@ providers=(
   Microsoft.Storage
   Microsoft.KeyVault
   Microsoft.Insights
+  Microsoft.Cdn
 )
 
 echo "Checking resource providers..."
