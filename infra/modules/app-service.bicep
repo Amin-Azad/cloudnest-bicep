@@ -1,4 +1,4 @@
-param projectname string
+param projectName string
 param location string
 param environment string
 param tags object
@@ -8,11 +8,15 @@ param nameSuffix string = ''
 param keyVaultName string
 param appDataStorageAccountName string
 param appDataContainerName string
-@secure()
-param sqlConnectionString string
+param sqlServerFqdn string
+param sqlDatabaseName string
 
-var appServicePlanName = 'asp-${projectname}-${environment}${nameSuffix}'
-var webAppName = 'webapp-${projectname}-${environment}${nameSuffix}-${uniqueString(resourceGroup().id, location)}'
+param appServiceSkuName string
+param appServiceSkuTier string
+param appServiceCapacity int
+
+var appServicePlanName = 'asp-${projectName}-${environment}${nameSuffix}'
+var webAppName = 'webapp-${projectName}-${environment}${nameSuffix}-${uniqueString(resourceGroup().id, location)}'
 
 resource appServicePlan 'Microsoft.Web/serverfarms@2025-03-01' = {
   name: appServicePlanName
@@ -20,9 +24,9 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2025-03-01' = {
   tags: tags
 
   sku: {
-    name: 'S1'
-    tier: 'Standard'
-    capacity: 1
+    name: appServiceSkuName
+    tier: appServiceSkuTier
+    capacity: appServiceCapacity
   }
   kind: 'linux'
 
@@ -87,8 +91,12 @@ resource webApp 'Microsoft.Web/sites@2025-03-01' = {
           value: appDataContainerName
         }
         {
-          name: 'SQL_CONNECTION_STRING'
-          value: sqlConnectionString
+          name: 'SQL_SERVER_FQDN'
+          value: sqlServerFqdn
+        }
+        {
+          name: 'SQL_DATABASE_NAME'
+          value: sqlDatabaseName
         }
       ]
     }
@@ -99,6 +107,6 @@ output appServicePlanName string = appServicePlan.name
 output appServicePlanId string = appServicePlan.id
 output webAppName string = webApp.name
 output webAppId string = webApp.id
-output webAppDefaultHostNAme string = webApp.properties.defaultHostName
+output webAppDefaultHostName string = webApp.properties.defaultHostName
 output webAppPrincipalId string = webApp.identity.principalId
 

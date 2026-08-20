@@ -2,44 +2,84 @@ param location string
 param environment string
 param tags object
 param projectName string
+param nameSuffix string = ''
+
+param vnetAddressPrefix string
+param appSubnetAddressPrefix string
+param dataSubnetAddressPrefix string
+param privateEndpointSubnetAddressPrefix string
 
 resource vnet 'Microsoft.Network/virtualNetworks@2025-05-01' = {
-  name: 'vnet-${projectName}-${environment}'
+  name: 'vnet-${projectName}-${environment}${nameSuffix}'
   location: location
   tags: tags
 
   properties: {
     addressSpace: {
       addressPrefixes: [
-        '10.10.0.0/16'
+        vnetAddressPrefix
       ]
     }
   }
 }
 
 resource nsgApp 'Microsoft.Network/networkSecurityGroups@2025-05-01' = {
-  name: 'nsg-${projectName}-app-${environment}'
+  name: 'nsg-${projectName}-app-${environment}${nameSuffix}'
   location: location
   tags: tags
+  properties: {
+    securityRules: [
+      {
+        name: 'Allow-App-To-PrivateEndpoints'
+        properties: {
+          priority: 100
+          access: 'Allow'
+          direction: 'Outbound'
+          protocol: '*'
+          sourcePortRange: '*'
+          destinationPortRange: '*'
+          sourceAddressPrefix: appSubnetAddressPrefix
+          destinationAddressPrefix: privateEndpointSubnetAddressPrefix
+        }
+      }
+    ]
+  }
 }
 
 resource nsgData 'Microsoft.Network/networkSecurityGroups@2025-05-01' = {
-  name: 'nsg-${projectName}-data-${environment}'
+  name: 'nsg-${projectName}-data-${environment}${nameSuffix}'
   location: location
   tags: tags
 }
 
 resource nsgPrivate 'Microsoft.Network/networkSecurityGroups@2025-05-01' = {
-  name: 'nsg-${projectName}-private-${environment}'
+  name: 'nsg-${projectName}-private-${environment}${nameSuffix}'
   location: location
   tags: tags
+  properties: {
+    securityRules: [
+      {
+        name: 'Allow-App-To-PrivateEndpoints'
+        properties: {
+          priority: 100
+          access: 'Allow'
+          direction: 'Inbound'
+          protocol: '*'
+          sourcePortRange: '*'
+          destinationPortRange: '*'
+          sourceAddressPrefix: appSubnetAddressPrefix
+          destinationAddressPrefix: privateEndpointSubnetAddressPrefix
+        }
+      }
+    ]
+  }
 }
 
 resource subnetApp 'Microsoft.Network/virtualNetworks/subnets@2025-05-01' = {
   parent: vnet
   name: 'snet-app'
   properties: {
-    addressPrefix: '10.10.1.0/24'
+    addressPrefix: appSubnetAddressPrefix
     networkSecurityGroup: {
       id: nsgApp.id
     }
@@ -53,13 +93,12 @@ resource subnetApp 'Microsoft.Network/virtualNetworks/subnets@2025-05-01' = {
     ]
   }
 }
+
 resource subnetData 'Microsoft.Network/virtualNetworks/subnets@2025-05-01' = {
   parent: vnet
   name: 'snet-data'
-
   properties: {
-    addressPrefix: '10.10.2.0/24'
-
+    addressPrefix: dataSubnetAddressPrefix
     networkSecurityGroup: {
       id: nsgData.id
     }
@@ -69,18 +108,17 @@ resource subnetData 'Microsoft.Network/virtualNetworks/subnets@2025-05-01' = {
 resource subnetPrivate 'Microsoft.Network/virtualNetworks/subnets@2025-05-01' = {
   parent: vnet
   name: 'snet-private'
-
   properties: {
-    addressPrefix: '10.10.3.0/24'
-
+    addressPrefix: privateEndpointSubnetAddressPrefix
+    privateEndpointNetworkPolicies: 'NetworkSecurityGroupEnabled'
     networkSecurityGroup: {
       id: nsgPrivate.id
     }
   }
 }
+
 output vnetName string = vnet.name
 output vnetId string = vnet.id
 output subnetAppId string = subnetApp.id
 output subnetDataId string = subnetData.id
 output subnetPrivateId string = subnetPrivate.id
-

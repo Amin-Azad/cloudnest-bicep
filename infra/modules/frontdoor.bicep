@@ -4,6 +4,10 @@ param tags object
 param webAppDefaultHostName string
 param secondaryWebAppDefaultHostName string
 
+param wafRateLimitThreshold int
+param healthProbePath string
+param healthProbeIntervalInSeconds int
+
 var frontDoorProfileName = 'afd-${projectName}-${environment}'
 var frontDoorEndpointName = 'fde-${projectName}-${environment}-${uniqueString(resourceGroup().id)}'
 var originGroupName = 'og-${projectName}-${environment}'
@@ -13,8 +17,8 @@ var routeName = 'route-${projectName}-${environment}'
 var wafPolicyName = 'waf${projectName}${environment}'
 var securityPolicyName = 'security-${projectName}-${environment}'
 
-// Standard Front Door WAF policy.
-// We use Standard to keep cost low for this learning/portfolio project.
+// Azure Front Door Standard supports custom WAF rules.
+// Managed Microsoft WAF rule sets require Front Door Premium.
 resource wafPolicy 'Microsoft.Network/frontDoorWebApplicationFirewallPolicies@2020-11-01' = {
   name: wafPolicyName
   location: 'global'
@@ -27,43 +31,24 @@ resource wafPolicy 'Microsoft.Network/frontDoorWebApplicationFirewallPolicies@20
       mode: 'Prevention'
     }
 
-    // Premium version note. Managed OWASP rules require Azure Front Door Premium.Premium is much more expensive, so we are NOT using it now.
-    // For production later:
-    // 1. Change both SKUs to 'Premium_AzureFrontDoor'
-    // 2. Replace customRules with managedRules.
-    /*
-    managedRules: {
-      managedRuleSets: [
-        {
-          ruleSetType: 'Microsoft_DefaultRuleSet'
-          ruleSetVersion: '2.1'
-          ruleSetAction: 'Block'
-        }
-      ]
-    }
-    */
-
-    // Standard-friendly custom WAF rule.
     customRules: {
       rules: [
         {
-          name: 'BlockSuspiciousQueryString'
+          name: 'RateLimitClients'
           enabledState: 'Enabled'
           priority: 100
-          ruleType: 'MatchRule'
+          ruleType: 'RateLimitRule'
+          rateLimitDurationInMinutes: 1
+          rateLimitThreshold: wafRateLimitThreshold
           action: 'Block'
           matchConditions: [
             {
-              matchVariable: 'QueryString'
-              operator: 'Contains'
+              matchVariable: 'SocketAddr'
+              operator: 'IPMatch'
               negateCondition: false
               matchValue: [
-                'select'
-                'union'
-                '<script'
-              ]
-              transforms: [
-                'Lowercase'
+                '0.0.0.0/0'
+                '::/0'
               ]
             }
           ]
@@ -73,12 +58,12 @@ resource wafPolicy 'Microsoft.Network/frontDoorWebApplicationFirewallPolicies@20
   }
   tags: tags
 }
+
 resource securityPolicy 'Microsoft.Cdn/profiles/securityPolicies@2021-06-01' = {
   name: securityPolicyName
   parent: frontDoorProfile
   dependsOn: [
     route
-    wafPolicy
   ]
   properties: {
     parameters: {
@@ -128,10 +113,10 @@ resource originGroup 'Microsoft.Cdn/profiles/originGroups@2021-06-01' = {
       successfulSamplesRequired: 3
     }
     healthProbeSettings: {
-      probePath: '/'
+      probePath: healthProbePath
       probeRequestType: 'HEAD'
       probeProtocol: 'Https'
-      probeIntervalInSeconds: 100
+      probeIntervalInSeconds: healthProbeIntervalInSeconds
     }
   }
 }
@@ -191,3 +176,4 @@ output frontDoorProfileName string = frontDoorProfile.name
 output frontDoorEndpointHostName string = frontDoorEndpoint.properties.hostName
 output wafPolicyName string = wafPolicy.name
 
+output frontDoorId string = frontDoorProfile.properties.frontDoorId

@@ -1,13 +1,17 @@
 param location string
-param projectName string
 param environment string
 param tags object
+
+param blobDeleteRetentionDays int
+param containerDeleteRetentionDays int
+param tierToCoolDays int
+param tierToArchiveDays int
 
 var storageAccountName = toLower('st${environment}${uniqueString(resourceGroup().id)}')
 var containerName = 'uploads'
 var fileShareName = 'sharedfiles'
 
-resource storaegAccount 'Microsoft.Storage/storageAccounts@2026-04-01' = {
+resource storageAccount 'Microsoft.Storage/storageAccounts@2026-04-01' = {
   name: storageAccountName
   location: location
   tags: tags
@@ -31,17 +35,17 @@ resource storaegAccount 'Microsoft.Storage/storageAccounts@2026-04-01' = {
   }
 }
 resource blobService 'Microsoft.Storage/storageAccounts/blobServices@2026-04-01' = {
-  parent: storaegAccount
+  parent: storageAccount
   name: 'default'
 
   properties: {
     deleteRetentionPolicy: {
       enabled: true
-      days: 14
+      days: blobDeleteRetentionDays
     }
     containerDeleteRetentionPolicy: {
       enabled: true
-      days: 14
+      days: containerDeleteRetentionDays
     }
     isVersioningEnabled: true
   }
@@ -54,18 +58,18 @@ resource uploadsContainer 'Microsoft.Storage/storageAccounts/blobServices/contai
   }
 }
 resource appDataContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-05-01' = {
-  name: '${storaegAccount.name}/default/app-data'
+  name: '${storageAccount.name}/default/app-data'
   properties: {
     publicAccess: 'None'
   }
 }
 
 resource fileService 'Microsoft.Storage/storageAccounts/fileServices@2026-04-01' = {
-  parent: storaegAccount
+  parent: storageAccount
   name: 'default'
 }
 
-resource sharedFIleShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2026-04-01' = {
+resource sharedFileShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2026-04-01' = {
   name: fileShareName
   parent: fileService
   properties: {
@@ -74,7 +78,8 @@ resource sharedFIleShare 'Microsoft.Storage/storageAccounts/fileServices/shares@
   }
 }
 resource lifecyclePolicy 'Microsoft.Storage/storageAccounts/managementPolicies@2023-05-01' = {
-  name: '${storaegAccount.name}/default'
+  parent: storageAccount
+  name: 'default'
   properties: {
     policy: {
       rules: [
@@ -91,10 +96,10 @@ resource lifecyclePolicy 'Microsoft.Storage/storageAccounts/managementPolicies@2
             actions: {
               baseBlob: {
                 tierToCool: {
-                  daysAfterModificationGreaterThan: 30
+                  daysAfterModificationGreaterThan: tierToCoolDays
                 }
                 tierToArchive: {
-                  daysAfterModificationGreaterThan: 90
+                  daysAfterModificationGreaterThan: tierToArchiveDays
                 }
               }
             }
@@ -105,10 +110,10 @@ resource lifecyclePolicy 'Microsoft.Storage/storageAccounts/managementPolicies@2
   }
 }
 
-output storageAccountName string = storaegAccount.name
-output storageAccountId string = storaegAccount.id
+output storageAccountName string = storageAccount.name
+output storageAccountId string = storageAccount.id
 output uploadsContainerName string = uploadsContainer.name
 
-output fileShareName string = sharedFIleShare.name
+output fileShareName string = sharedFileShare.name
 output appDataContainerName string = appDataContainer.name
 

@@ -6,12 +6,6 @@ param allowedLocations array = [
   'northeurope'
   'swedencentral'
 ]
-param requiredTags array = [
-  'project'
-  'environment'
-  'owner'
-]
-
 resource allowedLocationsAssignment 'Microsoft.Authorization/policyAssignments@2024-04-01' = {
   name: 'policy-allowed-locations-${environment}'
   properties: {

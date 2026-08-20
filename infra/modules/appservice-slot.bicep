@@ -26,6 +26,10 @@ resource stagingSlot 'Microsoft.Web/sites/slots@2024-04-01' = {
     httpsOnly: true
     siteConfig: {
       alwaysOn: true
+      ftpsState: 'Disabled'
+      minTlsVersion: '1.2'
+      scmMinTlsVersion: '1.2'
+
       appSettings: [
         {
           name: 'APP_ENVIRONMENT'
