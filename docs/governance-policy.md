@@ -1,5 +1,7 @@
 # Governance & Azure Policy
 
+> Historical working note: this file describes policy results from the first deployment. The rebuild will revalidate the assignments and record sanitized evidence.
+
 ## Objective
 
 The goal of this phase was to implement an enterprise governance layer for the CloudNest Azure environment using Azure Policy.

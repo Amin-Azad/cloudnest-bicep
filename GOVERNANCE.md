@@ -1,5 +1,7 @@
 # CloudNest Governance and Cost Optimization
 
+> Historical working note: this file describes the first implementation. The policies and budget will be revalidated during the rebuild before they are presented as current evidence.
+
 CloudNest includes governance and operational control practices designed to improve consistency, compliance, and cost awareness across the Azure environment.
 
 The project uses Azure-native governance services and operational best practices to simulate production-style cloud management.

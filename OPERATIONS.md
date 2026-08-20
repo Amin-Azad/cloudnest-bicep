@@ -1,5 +1,7 @@
 # CloudNest Operations and Monitoring
 
+> Historical working note: the automatic deployment workflows described below were removed during the baseline cleanup. Guarded manual What-If, deployment and cleanup workflows are planned for the rebuild.
+
 CloudNest includes monitoring, observability, CI/CD automation, autoscaling, and disaster recovery components designed to simulate operational cloud environments.
 
 The goal of this setup is to improve visibility, deployment reliability, scalability, and platform resilience.

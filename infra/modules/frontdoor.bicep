@@ -31,7 +31,7 @@ resource wafPolicy 'Microsoft.Network/frontDoorWebApplicationFirewallPolicies@20
     // For production later:
     // 1. Change both SKUs to 'Premium_AzureFrontDoor'
     // 2. Replace customRules with managedRules.
-   /*
+    /*
     managedRules: {
       managedRuleSets: [
         {
@@ -187,7 +187,7 @@ resource route 'Microsoft.Cdn/profiles/afdEndpoints/routes@2021-06-01' = {
   }
 }
 
-
 output frontDoorProfileName string = frontDoorProfile.name
 output frontDoorEndpointHostName string = frontDoorEndpoint.properties.hostName
 output wafPolicyName string = wafPolicy.name
+

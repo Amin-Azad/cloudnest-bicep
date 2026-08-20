@@ -1,0 +1,59 @@
+name: Repository validation
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: validation-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: src/package-lock.json
+
+      - name: Install Bicep
+        run: az bicep install --version v0.46.1
+
+      - name: Check Bicep formatting
+        shell: bash
+        run: |
+          set -euo pipefail
+          while IFS= read -r file; do
+            diff --unified "$file" <(az bicep format --file "$file" --stdout)
+          done < <(find infra -type f -name '*.bicep' -print | sort)
+
+      - name: Build Bicep
+        run: az bicep build --file infra/main.bicep --stdout >/dev/null
+
+      - name: Check Bash syntax
+        run: bash -n scripts/*.sh
+
+      - name: Check repository hygiene
+        run: ./scripts/check-repository-hygiene.sh
+
+      - name: Install application dependencies
+        run: npm ci --prefix src
+
+      - name: Check application syntax
+        run: node --check src/app.js

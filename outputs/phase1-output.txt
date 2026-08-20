@@ -1,14 +1,8 @@
-{
-  "deployLocation": {
-    "type": "String",
-    "value": "uksouth"
-  },
-  "storageAccountId": {
-    "type": "String",
-    "value": "/subscriptions/d3da25e5-680e-459c-99cf-0c4be70f4aad/resourceGroups/rg-cloudnest-dev/providers/Microsoft.Storage/storageAccounts/cloudnesdevnzeikn6c"
-  },
-  "storageAccountName": {
-    "type": "String",
-    "value": "cloudnesdevnzeikn6c"
-  }
-}
+CloudNest historical phase 1 output
+Recorded during the first portfolio deployment.
+
+Deployment location: UK South
+Storage account resource ID: [redacted]
+Storage account name: [redacted]
+
+This file is historical evidence. It does not describe the current deployment state.
