@@ -1,58 +1,42 @@
 # Dev Deployment Readiness
 
-CloudNest includes a guarded Azure deployment path for the dev environment. Before deployment, the repository validates the Bicep parameters, Azure resource providers, regional App Service quota and Azure SQL availability.
+CloudNest has a guarded deployment path for the dev environment.
 
-## Current subscription result
+Before deployment, the repository checks:
 
-The Azure subscription used for portfolio testing is an enabled Free Trial subscription with the spending limit enabled.
+- Bicep parameters
+- Azure subscription state
+- required resource providers
+- available App Service SKU capacity
+- available Total Regional VMs capacity
+- Azure SQL availability in the primary region
 
-The following European regions were checked for App Service capacity:
+The current dev design uses North Europe as primary, Sweden Central as DR, Linux App Service S1 and Azure SQL Basic.
 
-- North Europe
-- West Europe
-- Sweden Central
-- Norway East
-- Germany West Central
-- UK South
-- France Central
-- Denmark East
+## Current status
 
-All tested regions reported a `Total Regional VMs` App Service quota of `0`.
+**Deployment blocked by Azure App Service regional quota.**
 
-The planned dev regions are:
+Readiness checks were performed against both a free / credit subscription and a Pay-As-You-Go subscription. The candidate regions reported `Total Regional VMs` quota of `0`, so no CloudNest infrastructure deployment was attempted.
 
-- Primary: North Europe
-- DR: Sweden Central
-- App Service: S1 / Standard
-- Azure SQL: Basic
-
-Azure SQL Basic is available in both planned regions, and the required resource providers are registered. However, both planned regions currently report:
-
-- S1 App Service VM limit: 0
-- Total Regional VMs limit: 0
-
-Because of this subscription quota, the readiness script intentionally returns a failure and blocks What-If and deployment.
+The readiness script now checks remaining capacity using current usage and quota limits. It requires capacity for two primary App Service workers and one DR worker.
 
 ## Deployment safeguards
 
-The repository now uses:
+The repository uses:
 
 - environment-specific Bicep parameters
-- Bicep parameter validation in CI
+- Bicep validation in CI
 - separate GitHub OIDC identities for readiness/What-If and deployment
-- a manual What-If workflow
-- a manual deployment workflow requiring `DEPLOY-DEV`
-- Azure subscription and provider validation
-- App Service SKU and total regional quota checks
-- Azure SQL regional availability checks
+- manual What-If
+- manual deployment confirmation with `DEPLOY-DEV`
+- subscription and provider validation
+- App Service SKU and regional capacity checks
+- primary-region Azure SQL availability checks
 - GitHub `dev` environment scoping
 
-The deployment identities currently have Reader access only.
+Deployment should proceed only after regional capacity qualification passes.
 
-Deployment permissions will not be enabled while the subscription fails the regional capacity checks.
+## Qualification record
 
-## Status
-
-Current status: **deployment blocked by Azure subscription quota**
-
-No CloudNest infrastructure deployment was attempted after this condition was identified.
+The cost checks, subscription comparison, quota findings and deployment decision are recorded in [Cost-Qualified Deployment Readiness](cost-qualified-readiness.md).
