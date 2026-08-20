@@ -1,11 +1,11 @@
 param location string
 param projectName string
 param tags object
-param environement string
+param environment string
 param workspaceId string
 
 resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
-  name: 'appi-${projectName}-${environement}'
+  name: 'appi-${projectName}-${environment}'
   location: location
   kind: 'web'
   tags: tags

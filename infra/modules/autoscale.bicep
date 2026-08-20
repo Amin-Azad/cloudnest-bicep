@@ -3,7 +3,6 @@ param environment string
 
 param tags object
 param appServicePlanId string
-param appServicePlanName string
 
 resource autoscalesetting 'Microsoft.Insights/autoscalesettings@2022-10-01' = {
   name: 'autoscale-cloudnest-${environment}'
@@ -14,7 +13,7 @@ resource autoscalesetting 'Microsoft.Insights/autoscalesettings@2022-10-01' = {
     targetResourceUri: appServicePlanId
     profiles: [
       {
-        name: 'default-sutoscale-profile'
+        name: 'default-autoscale-profile'
         capacity: {
           minimum: '1'
           maximum: '2'

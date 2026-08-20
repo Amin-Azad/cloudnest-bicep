@@ -1,4 +1,3 @@
-param location string
 param environment string
 param projectName string
 param tags object
