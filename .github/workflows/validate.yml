@@ -48,7 +48,7 @@ jobs:
 
       - name: Build Bicep parameters
         env:
-          CLOUDNEST_ACTION_GROUP_EMAIL: validation@example.com
+          CLOUDNEST_ACTION_GROUP_EMAIL: validation-at-example.invalid
           CLOUDNEST_SQL_ADMIN_PASSWORD: Validation-Only-Password-123!
         run: |
           az bicep build-params \
