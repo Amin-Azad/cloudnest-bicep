@@ -19,6 +19,19 @@ param wafRateLimitThreshold int = 300
 param frontDoorHealthProbePath string = '/'
 param frontDoorHealthProbeIntervalInSeconds int = 100
 
+
+@description('Deploy the secondary disaster recovery region and associated resources.')
+param enableDr bool = true
+
+@description('Deploy Azure Front Door and origin access restrictions.')
+param enableFrontDoor bool = true
+
+@description('Deploy the staging App Service slot.')
+param enableDeploymentSlot bool = true
+
+@description('Deploy App Service autoscale configuration.')
+param enableAutoscale bool = true
+
 param appServiceSkuName string = 'S1'
 param appServiceSkuTier string = 'Standard'
 param appServiceCapacity int = 1
@@ -62,7 +75,7 @@ module networkModule './modules/network.bicep' = {
   }
 }
 
-module drNetworkModule './modules/network.bicep' = {
+module drNetworkModule './modules/network.bicep' = if (enableDr) {
   name: 'network-dr-deployment-${environment}'
   params: {
     location: drLocation
@@ -77,13 +90,14 @@ module drNetworkModule './modules/network.bicep' = {
   }
 }
 
-module vnetPeeringModule './modules/vnet-peering.bicep' = {
+module vnetPeeringModule './modules/vnet-peering.bicep' = if (enableDr) {
   name: 'vnet-peering-${environment}'
   params: {
     primaryVnetName: networkModule.outputs.vnetName
     primaryVnetId: networkModule.outputs.vnetId
-    drVnetName: drNetworkModule.outputs.vnetName
-    drVnetId: drNetworkModule.outputs.vnetId
+    // vnetPeeringModule
+    drVnetName: drNetworkModule!.outputs.vnetName
+    drVnetId: drNetworkModule!.outputs.vnetId
   }
 }
 
@@ -112,7 +126,8 @@ module privateEndpointModule './modules/private-endpoint.bicep' = {
     sqlServerId: sqlModule.outputs.sqlServerId
 
     vnetId: networkModule.outputs.vnetId
-    drVnetId: drNetworkModule.outputs.vnetId
+    enableDr: enableDr
+    drVnetId: enableDr ? drNetworkModule!.outputs.vnetId : ''
     subnetPrivateId: networkModule.outputs.subnetPrivateId
   }
 }
@@ -149,23 +164,23 @@ module keyVaultRbacModule './modules/keyvault-rbac.bicep' = {
   }
 }
 
-module stagingKeyVaultRbacModule './modules/keyvault-rbac.bicep' = {
+module stagingKeyVaultRbacModule './modules/keyvault-rbac.bicep' = if (enableDeploymentSlot) {
   name: 'keyvault-rbac-staging-${environment}'
   params: {
     keyVaultName: keyVaultModule.outputs.keyVaultName
-    principalId: slotModule.outputs.slotPrincipalId
+    principalId: slotModule!.outputs.slotPrincipalId
   }
 }
 
-module drKeyVaultRbacModule './modules/keyvault-rbac.bicep' = {
+module drKeyVaultRbacModule './modules/keyvault-rbac.bicep' = if (enableDr) {
   name: 'keyvault-rbac-dr-${environment}'
   params: {
     keyVaultName: keyVaultModule.outputs.keyVaultName
-    principalId: appServiceDrModule.outputs.webAppPrincipalId
+    principalId: appServiceDrModule!.outputs.webAppPrincipalId
   }
 }
 
-module appServiceDrModule './modules/app-service.bicep' = {
+module appServiceDrModule './modules/app-service.bicep' = if (enableDr) {
   name: 'app-service-dr-deployment-${environment}'
   params: {
     location: drLocation
@@ -181,7 +196,7 @@ module appServiceDrModule './modules/app-service.bicep' = {
 
     //storageAccountName: storageModule.outputs.storageAccountName
     //subNetId: networkModule.outputs.subnetAppId
-    subNetId: drNetworkModule.outputs.subnetAppId
+    subNetId: drNetworkModule!.outputs.subnetAppId
     appInsightsConnectionString: appInsightsModule.outputs.connectionString
     sqlServerFqdn: sqlModule.outputs.sqlServerFqdn
     sqlDatabaseName: sqlModule.outputs.sqlDatabaseName
@@ -190,37 +205,37 @@ module appServiceDrModule './modules/app-service.bicep' = {
     appServiceCapacity: appServiceCapacity
   }
 }
-module frontDoorModule './modules/frontdoor.bicep' = {
+module frontDoorModule './modules/frontdoor.bicep' = if (enableFrontDoor && enableDr) {
   name: 'frontdoor-deployment-${environment}'
   params: {
     environment: environment
     projectName: projectName
     tags: tags
     webAppDefaultHostName: appServiceModule.outputs.webAppDefaultHostName
-    secondaryWebAppDefaultHostName: appServiceDrModule.outputs.webAppDefaultHostName
+    secondaryWebAppDefaultHostName: appServiceDrModule!.outputs.webAppDefaultHostName
     wafRateLimitThreshold: wafRateLimitThreshold
     healthProbePath: frontDoorHealthProbePath
     healthProbeIntervalInSeconds: frontDoorHealthProbeIntervalInSeconds
   }
 }
 
-module primaryOriginSecurityModule './modules/app-service-origin-security.bicep' = {
+module primaryOriginSecurityModule './modules/app-service-origin-security.bicep' = if (enableFrontDoor && enableDr) {
   name: 'origin-security-primary-${environment}'
   params: {
     webAppName: appServiceModule.outputs.webAppName
-    frontDoorId: frontDoorModule.outputs.frontDoorId
+    frontDoorId: frontDoorModule!.outputs.frontDoorId
   }
 }
 
-module secondaryOriginSecurityModule './modules/app-service-origin-security.bicep' = {
+module secondaryOriginSecurityModule './modules/app-service-origin-security.bicep' = if (enableFrontDoor && enableDr) {
   name: 'origin-security-secondary-${environment}'
   params: {
-    webAppName: appServiceDrModule.outputs.webAppName
-    frontDoorId: frontDoorModule.outputs.frontDoorId
+    webAppName: appServiceDrModule!.outputs.webAppName
+    frontDoorId: frontDoorModule!.outputs.frontDoorId
   }
 }
 
-module slotModule './modules/appservice-slot.bicep' = {
+module slotModule './modules/appservice-slot.bicep' = if (enableDeploymentSlot) {
   name: 'slot-deployment-${environment}'
   params: {
     keyVaultName: keyVaultModule.outputs.keyVaultName
@@ -255,13 +270,21 @@ module diagnosticsModule 'modules/diagnostics.bicep' = {
   name: 'diagnostics-deployment-${environment}'
   params: {
     logAnalyticsWorkspaceId: monitoringModule.outputs.workspaceId
+
     primaryWebAppName: appServiceModule.outputs.webAppName
-    secondaryWebAppName: appServiceDrModule.outputs.webAppName
+
+    enableDr: enableDr
+    secondaryWebAppName: enableDr ? appServiceDrModule!.outputs.webAppName : ''
+
     storageAccountName: storageModule.outputs.storageAccountName
     keyVaultName: keyVaultModule.outputs.keyVaultName
     sqlServerName: sqlModule.outputs.sqlServerName
     sqlDatabaseName: sqlModule.outputs.sqlDatabaseName
-    frontDoorProfileName: frontDoorModule.outputs.frontDoorProfileName
+
+    enableFrontDoor: enableFrontDoor && enableDr
+    frontDoorProfileName: enableFrontDoor && enableDr
+  ? frontDoorModule!.outputs.frontDoorProfileName
+  : ''
   }
 }
 
@@ -286,7 +309,7 @@ module keyVaultModule './modules/keyvault.bicep' = {
   }
 }
 
-module autoscaleModule './modules/autoscale.bicep' = {
+module autoscaleModule './modules/autoscale.bicep' = if (enableAutoscale) {
   name: 'autoscale-deployment-${environment}'
   params: {
     location: location
@@ -309,11 +332,11 @@ module storageRbacModule './modules/storage-rbac.bicep' = {
     principalId: appServiceModule.outputs.webAppPrincipalId
   }
 }
-module drStorageRbacModule './modules/storage-rbac.bicep' = {
+module drStorageRbacModule './modules/storage-rbac.bicep' = if (enableDr) {
   name: 'storage-rbac-dr-${environment}'
   params: {
     storageAccountName: storageModule.outputs.storageAccountName
-    principalId: appServiceDrModule.outputs.webAppPrincipalId
+    principalId: appServiceDrModule!.outputs.webAppPrincipalId
   }
 }
 module sqlModule './modules/sql.bicep' = {
