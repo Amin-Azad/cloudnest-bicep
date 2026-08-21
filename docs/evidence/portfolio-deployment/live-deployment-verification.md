@@ -173,3 +173,24 @@ The successful live deployment was captured in Azure Portal and GitHub Actions b
 17. [High CPU alert rule](screenshots/17-high-cpu-alert-rule.png)
 18. [Azure Policy compliance](screenshots/18-policy-compliance.png)
 19. [Successful Azure deployment record](screenshots/19-azure-deployment-success.png)
+
+## Controlled cleanup
+
+After live verification and evidence capture, the portfolio workload was removed to stop ongoing cost.
+
+Post-cleanup state:
+
+- `rg-cloudnest-dev` recreated in North Europe
+- Resource count: 0
+- Bootstrap tags restored
+- Portfolio policy assignments removed
+- Deployment identity retained with:
+  - Contributor at `rg-cloudnest-dev`
+  - Resource Policy Contributor at `rg-cloudnest-dev`
+  - Role Based Access Control Administrator at `rg-cloudnest-dev`
+- Subscription-level Reader retained
+- Key Vault remains only as an Azure soft-delete record with scheduled purge on 2026-11-19
+
+The resource group and least-privilege deployment foundation were preserved so the environment can be redeployed later without keeping workload resources running.
+
+20. [Post-cleanup empty resource group](screenshots/20-post-cleanup-empty-resource-group.png)
