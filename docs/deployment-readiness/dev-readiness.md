@@ -37,6 +37,19 @@ The repository uses:
 
 Deployment should proceed only after regional capacity qualification passes.
 
+## Least-privilege Azure scope
+
+The deployment scope is prepared separately from the application infrastructure.
+
+- `rg-cloudnest-dev` is created as an empty bootstrap resource group
+- GitHub OIDC identities retain Reader access at subscription scope for readiness checks
+- What-If and deployment identities have Contributor only on `rg-cloudnest-dev`
+- neither GitHub identity has subscription-wide Contributor or Owner access
+- workflows verify the expected tenant, subscription, service principal and resource-group scope after OIDC login
+- the App Service quota gate still blocks What-If and deployment until regional capacity is available
+
+No CloudNest application infrastructure was deployed while preparing this scope.
+
 ## Qualification record
 
 The cost checks, subscription comparison, quota findings and deployment decision are recorded in [Cost-Qualified Deployment Readiness](cost-qualified-readiness.md).
