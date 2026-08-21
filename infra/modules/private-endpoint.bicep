@@ -8,7 +8,11 @@ param storageAccountId string
 param sqlServerId string
 
 param vnetId string
-param drVnetId string
+@description('Whether disaster recovery networking is deployed.')
+param enableDr bool = true
+
+@description('Disaster recovery VNet resource ID. Required when enableDr is true.')
+param drVnetId string = ''
 param subnetPrivateId string
 
 var blobPrivateDnsZoneName = 'privatelink.blob.${az.environment().suffixes.storage}'
@@ -97,7 +101,7 @@ resource sqlDnsVnetLink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2
   }
 }
 
-resource blobDrDnsZoneLink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2024-06-01' = {
+resource blobDrDnsZoneLink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2024-06-01' = if (enableDr) {
   name: 'link-${projectName}-blob-${environment}-dr'
   parent: blobPrivateDnsZone
   location: 'global'
@@ -109,7 +113,7 @@ resource blobDrDnsZoneLink 'Microsoft.Network/privateDnsZones/virtualNetworkLink
   }
 }
 
-resource fileDrDnsZoneLink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2024-06-01' = {
+resource fileDrDnsZoneLink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2024-06-01' = if (enableDr) {
   name: 'link-${projectName}-file-${environment}-dr'
   parent: filePrivateDnsZone
   location: 'global'
@@ -121,7 +125,7 @@ resource fileDrDnsZoneLink 'Microsoft.Network/privateDnsZones/virtualNetworkLink
   }
 }
 
-resource keyVaultDrDnsZoneLink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2024-06-01' = {
+resource keyVaultDrDnsZoneLink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2024-06-01' = if (enableDr) {
   name: 'link-${projectName}-kv-${environment}-dr'
   parent: keyVaultPrivateDnsZone
   location: 'global'
@@ -133,7 +137,7 @@ resource keyVaultDrDnsZoneLink 'Microsoft.Network/privateDnsZones/virtualNetwork
   }
 }
 
-resource sqlDrDnsZoneLink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2024-06-01' = {
+resource sqlDrDnsZoneLink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2024-06-01' = if (enableDr) {
   name: 'link-${projectName}-sql-${environment}-dr'
   parent: sqlPrivateDnsZone
   location: 'global'
@@ -314,4 +318,3 @@ output blobPrivateDnsZoneName string = blobPrivateDnsZone.name
 output filePrivateDnsZoneName string = filePrivateDnsZone.name
 output keyVaultPrivateDnsZoneName string = keyVaultPrivateDnsZone.name
 output sqlPrivateDnsZoneName string = sqlPrivateDnsZone.name
-

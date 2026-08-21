@@ -1,6 +1,10 @@
 # Bicep generated files
 infra/**/*.json
 
+# Tracked non-secret deployment parameters
+!infra/portfolio.parameters.json
+
+
 # Node dependencies
 node_modules/
 src/node_modules/

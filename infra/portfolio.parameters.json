@@ -1,0 +1,81 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "projectName": {
+      "value": "cloudnest"
+    },
+    "environment": {
+      "value": "portfolio"
+    },
+    "location": {
+      "value": "swedencentral"
+    },
+
+    "vnetAddressPrefix": {
+      "value": "10.30.0.0/16"
+    },
+    "appSubnetAddressPrefix": {
+      "value": "10.30.1.0/24"
+    },
+    "dataSubnetAddressPrefix": {
+      "value": "10.30.2.0/24"
+    },
+    "privateEndpointSubnetAddressPrefix": {
+      "value": "10.30.3.0/24"
+    },
+
+    "enableDr": {
+      "value": false
+    },
+    "enableFrontDoor": {
+      "value": false
+    },
+    "enableDeploymentSlot": {
+      "value": false
+    },
+    "enableAutoscale": {
+      "value": false
+    },
+
+    "appServiceSkuName": {
+      "value": "B1"
+    },
+    "appServiceSkuTier": {
+      "value": "Basic"
+    },
+    "appServiceCapacity": {
+      "value": 1
+    },
+
+    "sqlSkuName": {
+      "value": "Free"
+    },
+    "sqlSkuTier": {
+      "value": "Free"
+    },
+    "sqlSkuCapacity": {
+      "value": 5
+    },
+
+    "enableRequireTagPolicies": {
+      "value": false
+    },
+    "sqlMaxSizeBytes": {
+      "value": 33554432
+    },
+
+    "blobDeleteRetentionDays": {
+      "value": 7
+    },
+    "containerDeleteRetentionDays": {
+      "value": 7
+    },
+    "tierToCoolDays": {
+      "value": 30
+    },
+    "tierToArchiveDays": {
+      "value": 90
+    }
+  }
+}

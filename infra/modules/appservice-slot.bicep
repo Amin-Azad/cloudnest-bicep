@@ -47,4 +47,3 @@ resource stagingSlot 'Microsoft.Web/sites/slots@2024-04-01' = {
 output slotName string = stagingSlot.name
 output slotHostName string = stagingSlot.properties.defaultHostName
 output slotPrincipalId string = stagingSlot.identity.principalId
-

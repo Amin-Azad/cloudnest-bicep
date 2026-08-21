@@ -1,17 +1,29 @@
 param primaryWebAppName string
-param secondaryWebAppName string
+
+@description('Whether disaster recovery resources are deployed.')
+param enableDr bool = true
+
+@description('Secondary App Service name. Required when enableDr is true.')
+param secondaryWebAppName string = ''
+
 param storageAccountName string
 param keyVaultName string
 param sqlServerName string
 param sqlDatabaseName string
-param frontDoorProfileName string
+
+@description('Whether Azure Front Door is deployed.')
+param enableFrontDoor bool = true
+
+@description('Front Door profile name. Required when enableFrontDoor is true.')
+param frontDoorProfileName string = ''
+
 param logAnalyticsWorkspaceId string
 
 resource primaryWebApp 'Microsoft.Web/sites@2023-12-01' existing = {
   name: primaryWebAppName
 }
 
-resource secondaryWebApp 'Microsoft.Web/sites@2023-12-01' existing = {
+resource secondaryWebApp 'Microsoft.Web/sites@2023-12-01' existing = if (enableDr) {
   name: secondaryWebAppName
 }
 
@@ -32,7 +44,7 @@ resource sqlDatabase 'Microsoft.Sql/servers/databases@2023-08-01-preview' existi
   name: sqlDatabaseName
 }
 
-resource frontDoorProfile 'Microsoft.Cdn/profiles@2021-06-01' existing = {
+resource frontDoorProfile 'Microsoft.Cdn/profiles@2021-06-01' existing = if (enableFrontDoor) {
   name: frontDoorProfileName
 }
 
@@ -56,7 +68,7 @@ resource primaryAppServiceDiagnostics 'Microsoft.Insights/diagnosticSettings@202
   }
 }
 
-resource secondaryAppServiceDiagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
+resource secondaryAppServiceDiagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = if (enableDr) {
   name: 'diag-appservice-secondary'
   scope: secondaryWebApp
   properties: {
@@ -166,7 +178,7 @@ resource sqlDatabaseDiagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-0
   }
 }
 
-resource frontDoorDiagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
+resource frontDoorDiagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = if (enableFrontDoor) {
   name: 'diag-frontdoor'
   scope: frontDoorProfile
   properties: {
@@ -185,4 +197,3 @@ resource frontDoorDiagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-
     ]
   }
 }
-
