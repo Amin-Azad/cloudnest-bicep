@@ -1,98 +1,43 @@
-# CloudNest Governance and Cost Optimization
+# Governance
 
-> Historical working note: this file describes the first implementation. The policies and budget will be revalidated during the rebuild before they are presented as current evidence.
+CloudNest uses Azure Policy and tagging mainly to show how I would keep a small environment controlled and easier to manage.
 
-CloudNest includes governance and operational control practices designed to improve consistency, compliance, and cost awareness across the Azure environment.
+I kept the policy scope at `rg-cloudnest-dev` because this is a portfolio project. I did not use subscription-wide policy for something this small.
 
-The project uses Azure-native governance services and operational best practices to simulate production-style cloud management.
+## Policy
 
-## Governance Components
+The deployed portfolio profile used these policy areas:
 
-CloudNest governance features include:
+- allowed locations
+- deny public blob access
+- inherit project tag
+- inherit environment tag
+- inherit owner tag
 
-- Azure Policy
-- required resource tagging
-- remediation tasks
-- storage security policies
-- cost optimization practices
-- autoscaling
-- lifecycle management
+The first version also had hard require-tag policies. During live deployment I found that these blocked Azure Private DNS virtual network link resources because some child resources do not behave the same way with tags.
 
-## Azure Policy
+Instead of forcing the deployment through, I changed the portfolio profile and kept the useful policy controls which worked with the actual resource types.
 
-Azure Policy was used to enforce organizational standards and improve resource governance.
+After registering Microsoft.PolicyInsights and running compliance evaluation, Azure reported 100% resource compliance for the live portfolio environment.
 
-Implemented policies include:
+## Tags
 
-- required tags policy
-- deny public blob access policy
+The project uses simple tags such as project, environment, owner, costCenter and managedBy.
 
-These policies help ensure that deployed resources follow consistent operational and security standards.
+These are mainly there for ownership, filtering and cost tracking. I did not try to make a large enterprise tagging model for a small personal project.
 
-## Required Tags Policy
+## Cost control
 
-CloudNest uses mandatory tagging policies to improve resource organization and operational management.
+Cost was one of the main reasons I created the smaller portfolio profile.
 
-Example tags include:
+The full design uses more services and more than one region. The real deployment used one B1 App Service and Azure SQL Free, with DR, Front Door, staging slot and autoscale disabled.
 
-- project
-- environment
-- owner
+I also removed the workload after the verification was finished instead of keeping it running only for a live URL.
 
-Tagging improves:
+## What the deployment changed
 
-- cost tracking
-- operational visibility
-- resource management
-- governance consistency
+One useful lesson from this project was that governance rules also need testing against real Azure resources.
 
-## Remediation Tasks
+The policy definitions looked reasonable before deployment, but the hard tag requirement caused a real deployment problem. After correcting it, the final policy state was checked again and the environment reached 100% compliance.
 
-Azure Policy remediation tasks were used to apply policy corrections to existing resources.
-
-This helps ensure that resources remain compliant with governance requirements.
-
-## Storage Security Governance
-
-Policies were implemented to reduce public exposure of storage services.
-
-Blob storage public access restrictions help improve security and align with zero-trust principles.
-
-## Cost Optimization Strategy
-
-CloudNest includes several cost optimization practices.
-
-Implemented optimizations include:
-
-- autoscaling configuration
-- right-sized Azure services
-- lifecycle management concepts
-- controlled monitoring retention
-- modular Bicep deployments
-
-These practices help reduce unnecessary cloud costs while maintaining operational functionality.
-
-## Autoscaling and Resource Efficiency
-
-Autoscaling improves both operational performance and cost efficiency.
-
-Benefits include:
-
-- scaling resources only when needed
-- reducing idle infrastructure costs
-- improving application responsiveness
-
-## Operational Governance Benefits
-
-The governance architecture provides:
-
-- standardized deployments
-- policy enforcement
-- improved compliance
-- better cost visibility
-- operational consistency
-- improved cloud management practices
-
-## Summary
-
-CloudNest demonstrates how Azure governance, policy enforcement, and cost optimization practices can be integrated into Infrastructure as Code environments to support more secure and operationally mature cloud platforms.
+The deployment and compliance evidence is in [portfolio deployment verification](docs/evidence/portfolio-deployment/live-deployment-verification.md).
