@@ -1,51 +1,14 @@
-# Application CI/CD Pipeline
+# Application CI/CD
 
-> Historical working note: the workflow described here was removed because it deployed automatically from `main` and used a generated App Service name. A guarded staging deployment will replace it during the rebuild.
+CloudNest has a small Node.js and Express application in `src/`.
 
-## Goal
+The application is intentionally simple because the main focus of this repository is Azure infrastructure. It is there so the App Service has something real to run and so application deployment can be tested later if needed.
 
-Deploy a real application to Azure App Service using GitHub Actions CI/CD.
+## Current application
 
-This phase completes the CloudNest project by demonstrating:
+The current app serves a basic `GET /` route.
 
-- Infrastructure automation
-- Application deployment automation
-- Staging deployment workflow
-- Production slot swap deployment
-- Key Vault integration with Managed Identity
-
----
-
-# Architecture
-
-GitHub Actions pipeline deploys application code to:
-
-```text
-GitHub → GitHub Actions → Azure App Service Staging Slot
-```
-
-After validation:
-
-```text
-Staging Slot → Production Slot Swap
-```
-
----
-
-# Technologies Used
-
-- Azure App Service
-- Deployment Slots
-- GitHub Actions
-- OIDC Federation
-- Managed Identity
-- Azure Key Vault
-- Node.js
-- Express.js
-
----
-
-# Application Structure
+The repository contains:
 
 ```text
 src/
@@ -54,144 +17,24 @@ src/
 └── package-lock.json
 ```
 
----
+## Deployment slot design
 
-# Application Features
+The full Bicep design includes a staging slot on the primary App Service. The idea is to deploy the application to staging first and then use a slot swap for production release.
 
-The application displays:
+I kept this in the full design, but the staging slot was disabled in the smaller portfolio profile because I wanted to keep the real Azure deployment cheap and simple.
 
-- Deployment environment
-- Key Vault secret loading status
+So I do not claim that the current portfolio deployment proved a production slot swap.
 
-Example:
+## Managed Identity and Key Vault
 
-```html
-CloudNest App is running
-Environment: staging
-Key Vault Secret Loaded: yes
-```
+The App Service uses a system-assigned Managed Identity in the infrastructure design.
 
----
+In the live portfolio deployment the Web App identity was created and received Key Vault Secrets User and Storage Blob Data Reader roles.
 
-# GitHub Actions Workflow
+The infrastructure also supports Key Vault references for application settings so secret values do not need to be stored in the repository.
 
-Workflow file:
+## Why this is separate
 
-```text
-.github/workflows/app-deploy.yml
-```
+I kept application and infrastructure concerns separate because the project is mainly about cloud infrastructure.
 
-Pipeline steps:
-
-1. Checkout repository
-2. Setup Node.js
-3. Install dependencies
-4. Azure login using OIDC
-5. Deploy application to staging slot
-
----
-
-# Staging Slot Deployment
-
-Application is first deployed to:
-
-```text
-staging
-```
-
-Benefits:
-
-- Safe testing before production
-- Zero downtime deployments
-- Rollback capability
-- Enterprise deployment pattern
-
----
-
-# Production Release
-
-Production release is performed using slot swap:
-
-```bash
-az webapp deployment slot swap \
-  --resource-group rg-cloudnest-dev \
-  --name webapp-cloudnest-dev-baz6xqhbrtpb6 \
-  --slot staging \
-  --target-slot production
-```
-
----
-
-# Managed Identity + Key Vault
-
-The staging slot uses:
-
-- System-assigned managed identity
-- Key Vault Secrets User RBAC role
-
-Application secret is loaded dynamically from Azure Key Vault:
-
-```text
-APP_SECRET
-```
-
-No secrets are stored inside the repository.
-
----
-
-# Infrastructure vs Application Pipelines
-
-## Infrastructure Pipeline
-
-Responsible for:
-
-- App Service
-- Networking
-- Front Door
-- Monitoring
-- Key Vault
-- RBAC
-- Deployment slots
-- Policies
-- Autoscaling
-
-Workflow:
-
-```text
-deploy-infra.yml
-```
-
----
-
-## Application Pipeline
-
-Responsible for:
-
-- Deploying Node.js application code
-
-Workflow:
-
-```text
-app-deploy.yml
-```
-
----
-
-# Portfolio Value
-
-This phase demonstrates:
-
-- Real-world CI/CD workflow
-- Cloud-native deployment practices
-- Secure secret management
-- Enterprise deployment strategy
-- Infrastructure as Code
-- Application release automation
-
-CloudNest now demonstrates both:
-
-```text
-Infrastructure Automation
-+
-Application Deployment Automation
-```
+The infrastructure deployment was the part I fully validated in Azure. The application is small on purpose and I would expand the application pipeline only if the project needed more application release testing later.
