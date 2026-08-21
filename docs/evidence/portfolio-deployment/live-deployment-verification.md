@@ -149,3 +149,27 @@ Each finding was corrected without broadening deployment scope to subscription O
 The constrained CloudNest portfolio environment was successfully deployed from Bicep through a guarded GitHub Actions workflow, then validated against the live Azure control plane.
 
 The full production-style architecture remains in the repository. The portfolio profile demonstrates a smaller deployment adapted to actual subscription, quota and cost constraints.
+
+## Visual evidence
+
+The successful live deployment was captured in Azure Portal and GitHub Actions before cleanup.
+
+1. [GitHub Actions successful deployment](screenshots/01-github-success.png)
+2. [Azure resource group inventory](screenshots/02-resource-group.png)
+3. [Running B1 App Service and VNet integration](screenshots/03-app-service-running.png)
+4. [Azure SQL Free database online](screenshots/04-sql-free-online.png)
+5. [SQL public network access disabled](screenshots/05-sql-public-access-disabled.png)
+6. [SQL private endpoint approved](screenshots/06-sql-private-endpoint-approved.png)
+7. [Key Vault public network access disabled](screenshots/07-keyvault-public-access-disabled.png)
+8. [Key Vault private endpoint approved](screenshots/08-keyvault-private-endpoint-approved.png)
+9. [Storage security configuration](screenshots/09-storage-security-overview.png)
+10. [Storage Blob and File private endpoints approved](screenshots/10-storage-private-endpoints-approved.png)
+11. [VNet subnet segmentation](screenshots/11-vnet-subnet-segmentation.png)
+12. [Web App system-assigned managed identity](screenshots/12-webapp-managed-identity.png)
+13. [Managed identity RBAC assignments](screenshots/13-webapp-managed-identity-rbac.png)
+14. [App Service diagnostic settings](screenshots/14-appservice-diagnostic-settings.png)
+15. [HTTP 5xx alert rule](screenshots/15-http-5xx-alert-rule.png)
+16. [Live App Service Plan metrics](screenshots/16-app-service-plan-live-metrics.png)
+17. [High CPU alert rule](screenshots/17-high-cpu-alert-rule.png)
+18. [Azure Policy compliance](screenshots/18-policy-compliance.png)
+19. [Successful Azure deployment record](screenshots/19-azure-deployment-success.png)
