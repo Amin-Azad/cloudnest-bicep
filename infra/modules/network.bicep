@@ -128,4 +128,3 @@ output vnetId string = vnet.id
 output subnetAppId string = subnetApp.id
 output subnetDataId string = subnetData.id
 output subnetPrivateId string = subnetPrivate.id
-

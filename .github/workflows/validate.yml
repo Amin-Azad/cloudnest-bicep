@@ -39,10 +39,16 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          while IFS= read -r file; do
-            diff --unified "$file" <(az bicep format --file "$file" --stdout)
-          done < <(find infra -type f -name '*.bicep' -print | sort)
 
+          while IFS= read -r file; do
+            formatted="$(mktemp --suffix=.bicep)"
+            cp "$file" "$formatted"
+
+            az bicep format --file "$formatted"
+            diff --unified "$file" "$formatted"
+
+            rm -f "$formatted"
+          done < <(find infra -type f -name '*.bicep' -print | sort)
       - name: Build Bicep
         run: az bicep build --file infra/main.bicep --stdout >/dev/null
 

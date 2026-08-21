@@ -20,4 +20,3 @@ resource secretsUserRoleAssignment 'Microsoft.Authorization/roleAssignments@2022
     principalType: 'ServicePrincipal'
   }
 }
-

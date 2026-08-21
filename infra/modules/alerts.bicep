@@ -95,4 +95,3 @@ resource http5xxAlert 'Microsoft.Insights/metricAlerts@2018-03-01' = {
 output actionGroupName string = actionGroup.name
 output highCpuAlertName string = highCpuAlert.name
 output http5xxAlertName string = http5xxAlert.name
-

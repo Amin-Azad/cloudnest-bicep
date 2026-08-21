@@ -61,4 +61,3 @@ resource autoscalesetting 'Microsoft.Insights/autoscalesettings@2022-10-01' = {
     ]
   }
 }
-

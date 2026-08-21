@@ -109,4 +109,3 @@ output webAppName string = webApp.name
 output webAppId string = webApp.id
 output webAppDefaultHostName string = webApp.properties.defaultHostName
 output webAppPrincipalId string = webApp.identity.principalId
-

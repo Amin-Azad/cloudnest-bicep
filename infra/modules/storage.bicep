@@ -116,4 +116,3 @@ output uploadsContainerName string = uploadsContainer.name
 
 output fileShareName string = sharedFileShare.name
 output appDataContainerName string = appDataContainer.name
-
