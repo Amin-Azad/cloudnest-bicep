@@ -17,6 +17,7 @@ Azure deployment:
 - Provisioning state: Succeeded
 - Region: Sweden Central
 - Correlation ID: f5497ff4-3ac8-4b2e-a294-847501889abe
+- Verified live resource count before cleanup: 32
 
 ## Compute and application hosting
 
@@ -109,6 +110,13 @@ Active portfolio policies:
 - CloudNest - Inherit owner tag from resource group
 
 The original hard require-tag policies were removed from the portfolio profile after live deployment showed that they blocked Azure Private DNS virtual network link resources.
+
+After registering Microsoft.PolicyInsights and running a compliance evaluation, Azure Policy reported:
+
+- Overall resource compliance: 100%
+- Compliant resources: 31 of 31
+- Non-compliant resources: 0
+- Non-compliant policies: 0
 
 ## Monitoring and diagnostics
 
