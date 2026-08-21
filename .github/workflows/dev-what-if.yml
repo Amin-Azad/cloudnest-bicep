@@ -27,6 +27,9 @@ jobs:
       name: dev
 
     env:
+      AZURE_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
+      AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
       CLOUDNEST_ACTION_GROUP_EMAIL: ${{ vars.CLOUDNEST_ACTION_GROUP_EMAIL }}
       CLOUDNEST_SQL_ADMIN_PASSWORD: ${{ secrets.CLOUDNEST_SQL_ADMIN_PASSWORD }}
 
@@ -43,6 +46,8 @@ jobs:
           client-id: ${{ vars.AZURE_CLIENT_ID }}
           tenant-id: ${{ vars.AZURE_TENANT_ID }}
           subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      - name: Verify Azure identity and deployment scope
+        run: ./scripts/verify-dev-azure-scope.sh
 
       - name: Run dev readiness checks
         run: ./scripts/check-dev-readiness.sh
