@@ -59,7 +59,7 @@
     },
 
     "sqlMaxSizeBytes": {
-      "value": 2147483648
+      "value": 33554432
     },
 
     "blobDeleteRetentionDays": {
