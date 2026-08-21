@@ -1,168 +1,37 @@
-# Governance & Azure Policy
+# Azure Policy
 
-> Historical working note: this file describes policy results from the first deployment. The rebuild will revalidate the assignments and record sanitized evidence.
+CloudNest uses Azure Policy at resource-group scope for the portfolio environment.
 
-## Objective
+I kept the scope small because this is a personal project. The goal was to test useful policy controls in a real deployment, not to build a large management-group structure only for showing it.
 
-The goal of this phase was to implement an enterprise governance layer for the CloudNest Azure environment using Azure Policy.
+## Policies used
 
-This phase focuses on:
+The portfolio deployment used policies for allowed locations, public blob access and inherited tags.
 
-- resource compliance
-- approved deployment standards
-- tag governance
-- cost ownership
-- security guardrails
-- automated remediation
+The active policies were:
 
----
+- CloudNest - Allowed locations
+- CloudNest - Deny public blob access
+- CloudNest - Inherit project tag from resource group
+- CloudNest - Inherit environment tag from resource group
+- CloudNest - Inherit owner tag from resource group
 
-## Governance Architecture
+## What changed during deployment
 
-CloudNest uses Azure Policy at resource group scope to validate and control resources deployed into the development environment.
+The first version also had hard require-tag policies.
 
-Current governance scope:
+During the live deployment these blocked Private DNS virtual network link resources. This was a good example where a policy looked fine in the design but did not work well with every Azure resource type.
 
-- Resource Group: `rg-cloudnest-dev`
-- Environment: `dev`
-- Policy scope: Resource group
-- Enforcement model: Audit-first with selective deny enforcement
+I removed the hard require-tag enforcement from the portfolio profile and kept the inherit-tag policies instead.
 
-In a production enterprise environment, these policies would normally be assigned at Management Group scope so multiple subscriptions inherit the same standards.
+After that I registered Microsoft.PolicyInsights, triggered compliance evaluation and checked the result.
 
----
+The final live environment showed 100% resource compliance, with 31 of 31 resources compliant and no non-compliant policies.
 
-## Azure Policy Strategy
+## Why I kept the result
 
-CloudNest uses a staged governance rollout model.
+I did not remove the failed policy idea from the project history because it was something I learned from the real deployment.
 
-| Policy Area | Enforcement Mode | Purpose |
-|---|---|---|
-| Required project tag | DoNotEnforce | Audit missing project ownership |
-| Required environment tag | DoNotEnforce | Audit missing environment classification |
-| Required owner tag | DoNotEnforce | Audit missing ownership metadata |
-| Allowed locations | DoNotEnforce | Audit deployments outside approved regions |
-| Deny public blob access | Default | Block insecure anonymous blob exposure |
-| Inherit project tag | Default | Automatically add missing project tag |
-| Inherit environment tag | Default | Automatically add missing environment tag |
-| Inherit owner tag | Default | Automatically add missing owner tag |
+For me the useful part was not only getting a green compliance result. It was seeing how policy can also break deployment if the rule is too strict for some Azure child resources.
 
----
-
-## Audit vs Deny Strategy
-
-CloudNest intentionally uses `DoNotEnforce` for required tag and location policies.
-
-This allows policy compliance to be assessed without blocking active deployments.
-
-This is a common enterprise rollout pattern:
-
-1. Deploy policies in audit mode
-2. Review non-compliant resources
-3. Remediate missing configuration
-4. Switch mature policies to enforcement mode
-
-Security-sensitive policies, such as denying public blob access, are enforced immediately using `Default` mode.
-
----
-
-## Tag Governance
-
-The CloudNest resource group uses standard governance tags:
-
-| Tag | Value | Purpose |
-|---|---|---|
-| project | cloudnest | Identifies the project |
-| environment | dev | Identifies environment lifecycle |
-| owner | amin | Identifies technical owner |
-
-The resource group was updated with:
-
-```bash
-az group update \
-  --name rg-cloudnest-dev \
-  --tags project=cloudnest environment=dev owner=amin
-
-## Remediation Tasks
-
-Remediation tasks were created to apply missing inherited tags to existing resources.
-
-### Remediation Tasks
-
-| Name | Purpose |
-|---|---|
-| remediate-project-tag-dev | Apply missing project tag |
-| remediate-environment-tag-dev | Apply missing environment tag |
-| remediate-owner-tag-dev | Apply missing owner tag |
-
-### Verification Command
-
-```bash
-az policy remediation list \
-  --resource-group rg-cloudnest-dev \
-  --output table
-```
-
----
-
-## Security Guardrail: Public Blob Access
-
-A deny policy was assigned to prevent storage accounts from allowing anonymous public blob access.
-
-This protects against accidental public exposure of data.
-
-### Policy Assignment
-
-```text
-policy-deny-public-blob-dev
-```
-
-### Enforcement Mode
-
-```text
-Default
-```
-
----
-
-## Validation Commands
-
-### List Policy Assignments
-
-```bash
-az policy assignment list \
-  --resource-group rg-cloudnest-dev \
-  --query "[].{Name:name, Enforcement:enforcementMode, Identity:identity.type}" \
-  --output table
-```
-
-### List Remediation Tasks
-
-```bash
-az policy remediation list \
-  --resource-group rg-cloudnest-dev \
-  --output table
-```
-
-### Trigger Compliance Scan
-
-```bash
-az policy state trigger-scan \
-  --resource-group rg-cloudnest-dev
-```
-
-### View Compliance Summary
-
-```bash
-az policy state summarize \
-  --resource-group rg-cloudnest-dev
-```
-
-### View Resource Tags
-
-```bash
-az resource list \
-  --resource-group rg-cloudnest-dev \
-  --query "[].{Name:name, Type:type, Tags:tags}" \
-  --output table
-```
+The screenshots and final compliance result are in [portfolio deployment verification](evidence/portfolio-deployment/live-deployment-verification.md).
