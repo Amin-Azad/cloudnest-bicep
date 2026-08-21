@@ -1,95 +1,36 @@
-# CloudNest Cost-Qualified Deployment Readiness
+# Cost Qualified Readiness
 
-## Purpose
+This note records the earlier cost and quota check before the successful portfolio deployment.
 
-Before attempting another Azure deployment, CloudNest was checked for cost, subscription suitability, regional service availability and App Service quota.
+I wanted to know if the bigger dev design was safe to try before creating Azure resources.
 
-The goal was to avoid creating resources until the target subscription was proven suitable for the current Bicep design.
+## Design I checked
 
-## Dev design checked
+The design at that time used North Europe as primary, Sweden Central as DR, S1 App Service, Azure SQL Basic, Front Door, Storage, Key Vault, private endpoints, Log Analytics and Application Insights.
 
-The current dev configuration uses:
+The short test cost looked acceptable, but the Azure subscription still had a bigger problem.
 
-- North Europe as the primary region
-- Sweden Central as the DR region
-- Linux App Service S1
-- one primary App Service plan with autoscale from 1 to 2 workers
-- one DR App Service plan with 1 worker
-- Azure SQL Database Basic
-- Azure Front Door Standard
-- Storage, Key Vault, private endpoints, Log Analytics and Application Insights
+## Quota result
 
-## Cost qualification
+Both the free/credit subscription and the Pay-As-You-Go subscription were checked.
 
-Azure retail pricing was checked before deployment.
+The candidate regions showed `Total Regional VMs` quota of 0, so the App Service part of the design could not pass readiness.
 
-For the current S1 design, the known 24-hour core cost was estimated at roughly 50 DKK before low-volume storage, monitoring, networking and operation charges.
+I also checked Azure SQL availability and provider registration. The main blocker was App Service regional capacity, not the Bicep build.
 
-Premium v4 P0v4 was also checked as an alternative and remained within a reasonable short-test cost range.
+Because of that I did not deploy the bigger dev profile.
 
-The deployment was therefore considered affordable for a short controlled validation run.
+## Why this is still here
 
-No infrastructure was deployed as part of this cost check.
+I kept this note because it shows why the project later got a separate portfolio profile.
 
-## Subscription qualification
+Instead of changing the full architecture only to fit one subscription, I kept the bigger design in Bicep and created a smaller profile which could actually be deployed within the available quota and cost.
 
-Two Azure subscriptions were checked.
+That portfolio profile used Sweden Central, B1 App Service, Azure SQL Free and one region. It later passed Azure validation and What-If and was deployed successfully.
 
-### Free / credit subscription
+The final result is here:
 
-- subscription state: Enabled
-- App Service P0v4 quota was visible in North Europe, Germany West Central and Norway East
-- Total Regional VMs quota remained 0 in the checked regions
+- [Portfolio qualification](../evidence/portfolio-deployment/qualification-summary.md)
+- [Live deployment verification](../evidence/portfolio-deployment/live-deployment-verification.md)
 
-### Pay-As-You-Go subscription
-
-- subscription state: Enabled
-- quota ID confirmed as PayAsYouGo_2014-09-01
-- spending limit: Off
-- App Service Premium v4 quota was visible in several regions
-- Total Regional VMs quota remained 0 in the checked regions
-
-## Regional readiness result
-
-The readiness script was updated to check available quota rather than quota limits alone.
-
-It now validates:
-
-- current App Service usage
-- SKU quota limit
-- remaining SKU capacity
-- Total Regional VMs usage and remaining capacity
-- two workers for the primary App Service because autoscale can reach 2
-- one worker for the DR App Service
-- Azure SQL availability only in the primary region
-- Microsoft.Cdn registration for Azure Front Door
-
-The Pay-As-You-Go readiness run showed:
-
-- North Europe: App Service deployment blocked by Total Regional VMs quota of 0
-- Sweden Central: App Service deployment blocked by Total Regional VMs quota of 0
-- Azure SQL Basic: available in North Europe
-- all providers checked by the readiness script were registered after Microsoft.Cdn was added to the validation
-
-A separate quota inspection of the free / credit subscription also showed Total Regional VMs quota of 0 in the candidate regions.
-
-A North Europe S1 App Service quota increase was requested on the Pay-As-You-Go subscription.
-
-## Decision
-
-CloudNest was not deployed.
-
-The infrastructure passed cost review but failed App Service regional quota qualification on the available Azure subscriptions.
-
-Changing SKUs only to bypass the quota result was intentionally avoided.
-
-The next deployment attempt should happen only after the required App Service regional quota is available, followed by:
-
-1. readiness validation
-2. least-privilege deployment scope verification
-3. Azure What-If
-4. guarded deployment
-5. validation
-6. controlled teardown
-
-This is an expected pre-deployment control outcome rather than a deployment failure.
+So the result in this document is historical. It explains an earlier blocked path, not the current state of CloudNest.
