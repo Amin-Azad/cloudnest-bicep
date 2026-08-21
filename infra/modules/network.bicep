@@ -103,6 +103,9 @@ resource subnetData 'Microsoft.Network/virtualNetworks/subnets@2025-05-01' = {
       id: nsgData.id
     }
   }
+  dependsOn: [
+    subnetApp
+  ]
 }
 
 resource subnetPrivate 'Microsoft.Network/virtualNetworks/subnets@2025-05-01' = {
@@ -115,6 +118,9 @@ resource subnetPrivate 'Microsoft.Network/virtualNetworks/subnets@2025-05-01' = 
       id: nsgPrivate.id
     }
   }
+  dependsOn: [
+    subnetData
+  ]
 }
 
 output vnetName string = vnet.name
