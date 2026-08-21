@@ -3,9 +3,21 @@ name: Dev Deployment
 on:
   workflow_dispatch:
     inputs:
-      confirmation:
-        description: Type DEPLOY-DEV to confirm deployment
+      profile:
+        description: Deployment profile
         required: true
+        default: dev
+        type: choice
+        options:
+          - dev
+          - portfolio
+      confirmation:
+        description: Type DEPLOY-DEV or DEPLOY-PORTFOLIO
+        required: true
+        type: string
+      approved_commit:
+        description: Exact commit SHA approved for portfolio deployment
+        required: false
         type: string
 
 permissions:
@@ -18,7 +30,7 @@ concurrency:
 
 jobs:
   deploy:
-    name: Guarded Dev Deployment
+    name: Guarded CloudNest Deployment
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
@@ -31,18 +43,58 @@ jobs:
       AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
       CLOUDNEST_ACTION_GROUP_EMAIL: ${{ vars.CLOUDNEST_ACTION_GROUP_EMAIL }}
       CLOUDNEST_SQL_ADMIN_PASSWORD: ${{ secrets.CLOUDNEST_SQL_ADMIN_PASSWORD }}
+
     steps:
       - name: Check out repository
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
 
       - name: Verify manual deployment request
+        shell: bash
         run: |
-          if [[ "${{ inputs.confirmation }}" != "DEPLOY-DEV" ]]; then
-            echo "ERROR: deployment confirmation must be DEPLOY-DEV."
-            exit 1
+          set -euo pipefail
+
+          profile="${{ inputs.profile }}"
+          confirmation="${{ inputs.confirmation }}"
+
+          if [[ "$profile" == "dev" ]]; then
+            if [[ "$confirmation" != "DEPLOY-DEV" ]]; then
+              echo "ERROR: dev deployment confirmation must be DEPLOY-DEV."
+              exit 1
+            fi
+
+            echo "Dev deployment confirmation accepted."
+            exit 0
           fi
 
-          echo "Manual deployment confirmation accepted."
+          if [[ "$profile" == "portfolio" ]]; then
+            if [[ "$confirmation" != "DEPLOY-PORTFOLIO" ]]; then
+              echo "ERROR: portfolio deployment confirmation must be DEPLOY-PORTFOLIO."
+              exit 1
+            fi
+
+            approved_commit="${{ inputs.approved_commit }}"
+
+            if [[ -z "$approved_commit" ]]; then
+              echo "ERROR: approved_commit is required for portfolio deployment."
+              exit 1
+            fi
+
+            actual_commit="$(git rev-parse HEAD)"
+
+            if [[ "$actual_commit" != "$approved_commit" ]]; then
+              echo "ERROR: checked-out commit does not match approved commit."
+              echo "Expected: $approved_commit"
+              echo "Actual:   $actual_commit"
+              exit 1
+            fi
+
+            echo "Portfolio deployment confirmation accepted."
+            echo "Approved commit verified: $actual_commit"
+            exit 0
+          fi
+
+          echo "ERROR: unsupported deployment profile: $profile"
+          exit 1
 
       - name: Install Bicep
         run: az bicep install --version v0.46.1
@@ -53,13 +105,19 @@ jobs:
           client-id: ${{ vars.AZURE_DEPLOY_CLIENT_ID }}
           tenant-id: ${{ vars.AZURE_TENANT_ID }}
           subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
       - name: Verify Azure identity and deployment scope
         run: ./scripts/verify-dev-azure-scope.sh
+
       - name: Run dev readiness checks
+        if: ${{ inputs.profile == 'dev' }}
         run: ./scripts/check-dev-readiness.sh
 
       - name: Verify deployment resource group
+        shell: bash
         run: |
+          set -euo pipefail
+
           if ! az group show \
             --name rg-cloudnest-dev \
             --output none 2>/dev/null; then
@@ -68,11 +126,148 @@ jobs:
             exit 1
           fi
 
-      - name: Deploy CloudNest dev
+          echo "Deployment resource group verified."
+
+      - name: Verify portfolio parameters
+        if: ${{ inputs.profile == 'portfolio' }}
+        shell: bash
         run: |
+          set -euo pipefail
+
+          test -f infra/portfolio.parameters.json
+
+          jq -e '
+            .parameters.environment.value == "portfolio" and
+            .parameters.location.value == "swedencentral" and
+            .parameters.enableDr.value == false and
+            .parameters.enableFrontDoor.value == false and
+            .parameters.enableDeploymentSlot.value == false and
+            .parameters.enableAutoscale.value == false and
+            .parameters.appServiceSkuName.value == "B1" and
+            .parameters.appServiceSkuTier.value == "Basic" and
+            .parameters.appServiceCapacity.value == 1 and
+            .parameters.sqlSkuName.value == "Free" and
+            .parameters.sqlSkuTier.value == "Free"
+          ' infra/portfolio.parameters.json >/dev/null
+
+          echo "Portfolio deployment parameters verified."
+
+      - name: Validate portfolio deployment
+        if: ${{ inputs.profile == 'portfolio' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          az deployment group validate \
+            --resource-group rg-cloudnest-dev \
+            --template-file infra/main.bicep \
+            --parameters @infra/portfolio.parameters.json \
+            --parameters \
+              actionGroupEmail="$CLOUDNEST_ACTION_GROUP_EMAIL" \
+              sqlAdminPassword="$CLOUDNEST_SQL_ADMIN_PASSWORD" \
+            --output none
+
+          echo "Azure portfolio deployment validation passed."
+
+      - name: Run portfolio What-If safety gate
+        if: ${{ inputs.profile == 'portfolio' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          az deployment group what-if \
+            --resource-group rg-cloudnest-dev \
+            --template-file infra/main.bicep \
+            --parameters @infra/portfolio.parameters.json \
+            --parameters \
+              actionGroupEmail="$CLOUDNEST_ACTION_GROUP_EMAIL" \
+              sqlAdminPassword="$CLOUDNEST_SQL_ADMIN_PASSWORD" \
+            --result-format FullResourcePayloads \
+            --no-pretty-print \
+            > portfolio-what-if.json
+
+          destructive="$(
+            jq '
+              [
+                .changes[]?
+                | select(
+                    .changeType == "Delete" or
+                    .changeType == "Replace"
+                  )
+              ]
+              | length
+            ' portfolio-what-if.json
+          )"
+
+          if [[ "$destructive" -ne 0 ]]; then
+            echo "ERROR: destructive What-If changes detected."
+
+            jq '
+              .changes[]?
+              | select(
+                  .changeType == "Delete" or
+                  .changeType == "Replace"
+                )
+              | {
+                  changeType,
+                  resourceId
+                }
+            ' portfolio-what-if.json
+
+            exit 1
+          fi
+
+          create_count="$(
+            jq '[.changes[]? | select(.changeType == "Create")] | length' \
+              portfolio-what-if.json
+          )"
+
+          unsupported_count="$(
+            jq '[.changes[]? | select(.changeType == "Unsupported")] | length' \
+              portfolio-what-if.json
+          )"
+
+          echo "Portfolio What-If:"
+          echo "Create:      $create_count"
+          echo "Unsupported: $unsupported_count"
+          echo "Delete:      0"
+          echo "Replace:     0"
+          echo "Final portfolio What-If safety gate passed."
+
+      - name: Deploy CloudNest dev
+        if: ${{ inputs.profile == 'dev' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
           az deployment group create \
             --name "cloudnest-dev-${GITHUB_RUN_ID}" \
             --resource-group rg-cloudnest-dev \
             --template-file infra/main.bicep \
             --parameters infra/environments/dev/main.bicepparam \
             --mode Incremental
+
+      - name: Deploy CloudNest portfolio
+        if: ${{ inputs.profile == 'portfolio' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          az deployment group create \
+            --name "cloudnest-portfolio-${GITHUB_RUN_ID}" \
+            --resource-group rg-cloudnest-dev \
+            --template-file infra/main.bicep \
+            --parameters @infra/portfolio.parameters.json \
+            --parameters \
+              actionGroupEmail="$CLOUDNEST_ACTION_GROUP_EMAIL" \
+              sqlAdminPassword="$CLOUDNEST_SQL_ADMIN_PASSWORD" \
+            --mode Incremental \
+            --output json \
+            > portfolio-deployment.json
+
+          jq '{
+            name: .name,
+            provisioningState: .properties.provisioningState,
+            timestamp: .properties.timestamp,
+            correlationId: .properties.correlationId
+          }' portfolio-deployment.json
