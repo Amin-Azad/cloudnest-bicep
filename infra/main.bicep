@@ -284,9 +284,7 @@ module diagnosticsModule 'modules/diagnostics.bicep' = {
     sqlDatabaseName: sqlModule.outputs.sqlDatabaseName
 
     enableFrontDoor: enableFrontDoor && enableDr
-    frontDoorProfileName: enableFrontDoor && enableDr
-  ? frontDoorModule!.outputs.frontDoorProfileName
-  : ''
+    frontDoorProfileName: enableFrontDoor && enableDr ? frontDoorModule!.outputs.frontDoorProfileName : ''
   }
 }
 
@@ -387,4 +385,3 @@ output keyVaultUri string = keyVaultModule.outputs.keyVaultUri
 output sqlServerName string = sqlModule.outputs.sqlServerName
 output sqlServerFqdn string = sqlModule.outputs.sqlServerFqdn
 output sqlDatabaseName string = sqlModule.outputs.sqlDatabaseName
-
