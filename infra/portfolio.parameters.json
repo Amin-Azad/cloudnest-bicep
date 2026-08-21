@@ -58,6 +58,9 @@
       "value": 5
     },
 
+    "enableRequireTagPolicies": {
+      "value": false
+    },
     "sqlMaxSizeBytes": {
       "value": 33554432
     },

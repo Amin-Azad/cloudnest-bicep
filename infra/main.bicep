@@ -19,6 +19,8 @@ param wafRateLimitThreshold int = 300
 param frontDoorHealthProbePath string = '/'
 param frontDoorHealthProbeIntervalInSeconds int = 100
 
+@description('Enforce hard require-tag policies.')
+param enableRequireTagPolicies bool = true
 
 @description('Deploy the secondary disaster recovery region and associated resources.')
 param enableDr bool = true
@@ -323,6 +325,7 @@ module policyModule './modules/policy.bicep' = {
   name: 'policy-deployment-${environment}'
   params: {
     environment: environment
+    enableRequireTagPolicies: enableRequireTagPolicies
   }
 }
 module storageRbacModule './modules/storage-rbac.bicep' = {

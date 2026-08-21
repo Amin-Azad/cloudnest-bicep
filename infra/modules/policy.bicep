@@ -1,6 +1,10 @@
 targetScope = 'resourceGroup'
 
 param environment string
+
+@description('Enforce hard require-tag policies on all resources.')
+param enableRequireTagPolicies bool = true
+
 param allowedLocations array = [
   'westeurope'
   'northeurope'
@@ -21,7 +25,7 @@ resource allowedLocationsAssignment 'Microsoft.Authorization/policyAssignments@2
     }
   }
 }
-resource requireProjectTagAssignment 'Microsoft.Authorization/policyAssignments@2024-04-01' = {
+resource requireProjectTagAssignment 'Microsoft.Authorization/policyAssignments@2024-04-01' = if (enableRequireTagPolicies) {
   name: 'policy-require-project-tag-${environment}'
   properties: {
     displayName: 'CloudNest - Require project tag'
@@ -39,7 +43,7 @@ resource requireProjectTagAssignment 'Microsoft.Authorization/policyAssignments@
   }
 }
 
-resource requireEnvironmentTagAssignment 'Microsoft.Authorization/policyAssignments@2024-04-01' = {
+resource requireEnvironmentTagAssignment 'Microsoft.Authorization/policyAssignments@2024-04-01' = if (enableRequireTagPolicies) {
   name: 'policy-require-environment-tag-${environment}'
   properties: {
     displayName: 'CloudNest - Require environment tag'
@@ -57,7 +61,7 @@ resource requireEnvironmentTagAssignment 'Microsoft.Authorization/policyAssignme
   }
 }
 
-resource requireOwnerTagAssignment 'Microsoft.Authorization/policyAssignments@2024-04-01' = {
+resource requireOwnerTagAssignment 'Microsoft.Authorization/policyAssignments@2024-04-01' = if (enableRequireTagPolicies) {
   name: 'policy-require-owner-tag-${environment}'
   properties: {
     displayName: 'CloudNest - Require owner tag'
