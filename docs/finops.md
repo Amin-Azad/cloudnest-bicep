@@ -1,138 +1,41 @@
-# Cost Optimization & FinOps
+# Cost and FinOps
 
-> Historical working note: this file describes the first deployment. Current cost, budget and cleanup evidence will be recorded during the rebuild.
+Cost became a real part of this project because the full CloudNest design was bigger than what I wanted to keep running in a personal Azure subscription.
 
-## Objective
+Instead of ignoring that, I made a smaller portfolio profile for the live deployment.
 
-Implement operational cost optimization and FinOps controls for the CloudNest platform.
+## What changed for the portfolio profile
 
----
+The full design keeps two regions, Front Door, staging slot and autoscale.
 
-# Implemented Cost Optimization Features
+The portfolio profile used one region in Sweden Central, one B1 App Service and Azure SQL Free. DR, Front Door, staging slot and autoscale were disabled.
 
-## 1. Resource Tagging Strategy
+This kept the main security and networking parts of the project while reducing the parts which would create more cost.
 
-Standardized tags were applied across resources:
+## Cost checks before deployment
 
-| Tag | Value |
-|---|---|
-| project | cloudnest |
-| environment | dev |
-| owner | amin |
-| costCenter | engineering |
-| managedBy | bicep |
+Before trying the live deployment I checked Azure pricing, regional service availability and App Service quota.
 
-Purpose:
-- cost tracking
-- governance
-- operational ownership
-- filtering/reporting
+One earlier deployment path was blocked because the available subscriptions showed `Total Regional VMs` quota of 0 in the regions I was checking.
 
----
+I kept that result in the repository because it explains why I did not just keep retrying the same design.
 
-# 2. Azure Budget Alerts
+The earlier qualification notes are in [deployment readiness](deployment-readiness/cost-qualified-readiness.md).
 
-A monthly Azure Cost Management budget was deployed using Bicep.
+## Cost controls in the design
 
-Budget configuration:
+The Bicep uses project and environment tags so resources can be grouped and tracked more easily.
 
-| Setting | Value |
-|---|---|
-| Budget Name | budget-cloudnest-dev |
-| Amount | 50 |
-| Scope | Resource Group |
-| Time Grain | Monthly |
+Storage lifecycle rules are included for moving older data to cheaper tiers. Log Analytics retention is also kept limited instead of retaining logs for a long time without a reason.
 
-Alert thresholds:
+Autoscale is part of the full design, but it was disabled for the portfolio profile because B1 does not fit the same autoscale design and the live test did not need it.
 
-| Threshold | Action |
-|---|---|
-| 50% | Email alert |
-| 80% | Email alert |
-| 100% | Email alert |
+## Cleanup
 
----
+The strongest cost control for the portfolio run was simple: I removed the workload after the deployment was verified.
 
-# 3. Log Analytics Retention Optimization
+I captured the screenshots and Azure details first, then cleaned the resources so they did not keep generating cost only for portfolio purposes.
 
-Log Analytics retention was configured to:
+The empty resource group and deployment identity were kept so another controlled deployment is still possible later.
 
-```text
-30 days
-```
-
-Purpose:
-- reduce long-term monitoring cost
-- avoid unnecessary log retention charges
-- optimize operational observability spending
-
----
-
-# 4. Storage Lifecycle Management
-
-Azure Storage lifecycle management policy was implemented.
-
-Lifecycle rules:
-
-| After | Action |
-|---|---|
-| 30 days | Move to Cool tier |
-| 90 days | Move to Archive tier |
-
-Deletion was intentionally avoided to preserve long-term recoverability.
-
-Purpose:
-- reduce storage cost
-- preserve historical data
-- improve operational sustainability
-
----
-
-# 5. Autoscaling Cost Optimization
-
-App Service autoscaling was configured with controlled scaling boundaries.
-
-Configuration:
-
-| Setting | Value |
-|---|---|
-| Minimum Instances | 1 |
-| Default Instances | 1 |
-| Maximum Instances | 2 |
-
-Scaling rules:
-
-| Condition | Action |
-|---|---|
-| CPU > 70% | Scale out |
-| CPU < 30% | Scale in |
-
-Purpose:
-- prevent overprovisioning
-- dynamically respond to workload demand
-- optimize compute spending
-
----
-
-# Operational FinOps Benefits
-
-CloudNest now includes:
-
-- cost visibility
-- budget governance
-- automated cost controls
-- storage optimization
-- monitoring optimization
-- controlled autoscaling
-- operational sustainability
-
----
-
-# Portfolio Value
-
-This phase demonstrates:
-
-- Azure FinOps practices
-- operational cloud governance
-- cost-aware infrastructure engineering
-- Infrastructure as Code operational maturity
+This made more sense to me than keeping a live environment running just to have a URL on the README.

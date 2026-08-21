@@ -1,55 +1,28 @@
 # Dev Deployment Readiness
 
-CloudNest has a guarded deployment path for the dev environment.
+This note is kept as the earlier dev deployment check before the smaller portfolio profile was created.
 
-Before deployment, the repository checks:
+At that time the full dev design used North Europe as primary, Sweden Central as DR, Linux App Service S1 and Azure SQL Basic.
 
-- Bicep parameters
-- Azure subscription state
-- required resource providers
-- available App Service SKU capacity
-- available Total Regional VMs capacity
-- Azure SQL availability in the primary region
+## What happened
 
-The current dev design uses North Europe as primary, Sweden Central as DR, Linux App Service S1 and Azure SQL Basic.
+The readiness script checked the Azure subscription, required providers, App Service SKU capacity, Total Regional VMs quota and SQL availability.
 
-## Current status
+The checked subscriptions showed `Total Regional VMs` quota of 0 in the candidate regions. Because of that I did not continue with the full dev deployment.
 
-**Deployment blocked by Azure App Service regional quota.**
+I treated this as a deployment qualification problem, not something to bypass by changing random SKUs until one worked.
 
-Readiness checks were performed against both a free / credit subscription and a Pay-As-You-Go subscription. The candidate regions reported `Total Regional VMs` quota of `0`, so no CloudNest infrastructure deployment was attempted.
+## What I changed after this
 
-The readiness script now checks remaining capacity using current usage and quota limits. It requires capacity for two primary App Service workers and one DR worker.
+The readiness script was improved to check remaining capacity instead of only reading the quota limit.
 
-## Deployment safeguards
+I also prepared a least-privilege deployment scope with `rg-cloudnest-dev`, subscription Reader for checks and resource-group scoped deployment permissions.
 
-The repository uses:
+Later I created the smaller portfolio profile with B1 App Service and Azure SQL Free in Sweden Central. That profile passed validation and What-If and was successfully deployed.
 
-- environment-specific Bicep parameters
-- Bicep validation in CI
-- separate GitHub OIDC identities for readiness/What-If and deployment
-- manual What-If
-- manual deployment confirmation with `DEPLOY-DEV`
-- subscription and provider validation
-- App Service SKU and regional capacity checks
-- primary-region Azure SQL availability checks
-- GitHub `dev` environment scoping
+So this document is historical readiness evidence for the bigger dev design. It is not the current deployment status.
 
-Deployment should proceed only after regional capacity qualification passes.
+The successful deployment is recorded here:
 
-## Least-privilege Azure scope
-
-The deployment scope is prepared separately from the application infrastructure.
-
-- `rg-cloudnest-dev` is created as an empty bootstrap resource group
-- GitHub OIDC identities retain Reader access at subscription scope for readiness checks
-- What-If and deployment identities have Contributor only on `rg-cloudnest-dev`
-- neither GitHub identity has subscription-wide Contributor or Owner access
-- workflows verify the expected tenant, subscription, service principal and resource-group scope after OIDC login
-- the App Service quota gate still blocks What-If and deployment until regional capacity is available
-
-No CloudNest application infrastructure was deployed while preparing this scope.
-
-## Qualification record
-
-The cost checks, subscription comparison, quota findings and deployment decision are recorded in [Cost-Qualified Deployment Readiness](cost-qualified-readiness.md).
+- [Portfolio deployment verification](../evidence/portfolio-deployment/live-deployment-verification.md)
+- [Portfolio qualification](../evidence/portfolio-deployment/qualification-summary.md)
