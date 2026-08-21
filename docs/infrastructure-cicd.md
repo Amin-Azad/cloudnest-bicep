@@ -1,142 +1,45 @@
-# Infrastructure CI/CD Pipeline
+# Infrastructure CI/CD
 
-> Historical working note: the deployment workflow described here was removed because it could deploy on a push to `main`. The repository currently runs credential-free validation only; guarded What-If, deployment and cleanup workflows are planned.
+CloudNest uses GitHub Actions and Bicep for infrastructure validation and deployment.
 
-## Goal
+The old version of this project had an automatic deployment workflow from `main`. I removed that because I did not want a personal Azure subscription deploying infrastructure from every push.
 
-Automate Azure infrastructure deployments using GitHub Actions and Bicep.
+The current setup is more controlled.
 
-This pipeline enables Infrastructure as Code (IaC) deployments directly from GitHub.
+## Validation
 
----
+Pull requests run repository checks and Bicep validation without signing in to Azure.
 
-# Technologies Used
+The validation workflow has read-only repository permission and uses pinned action versions.
 
-- GitHub Actions
-- Azure Bicep
-- Azure CLI
-- OIDC Federation
-- Azure Resource Manager
+## Azure login
 
----
+Azure workflows use GitHub OIDC instead of storing a client secret.
 
-# Infrastructure Pipeline Workflow
+The workflow checks the tenant, subscription, service principal and expected resource-group scope after login.
 
-Workflow file:
+## What-If and deployment
 
-```text
-.github/workflows/deploy-infra.yml
-```
+The dev path has a separate What-If workflow and a guarded manual deployment workflow.
 
-Pipeline stages:
+For the portfolio profile, deployment needs `DEPLOY-PORTFOLIO` and the exact approved commit SHA. The workflow checks that the current commit is the one which was approved.
 
-1. Checkout repository
-2. Azure login using OIDC
-3. Install Bicep
-4. Validate Bicep templates
-5. Execute What-If deployment
-6. Deploy infrastructure to Azure
+It then runs Azure deployment validation and What-If. Delete and Replace changes are treated as destructive and stop the workflow.
 
----
+The final portfolio deployment was run through this workflow successfully.
 
-# Infrastructure Components
+## Scope
 
-The pipeline deploys:
+The GitHub deployment identity is not subscription Owner.
 
-- Resource Groups
-- Virtual Network
-- Subnets
-- NSGs
-- Storage Accounts
-- Azure Key Vault
-- App Service Plan
-- Azure App Service
-- Deployment Slots
-- Front Door
-- WAF Policies
-- Private Endpoints
-- Private DNS Zones
-- Log Analytics
-- Application Insights
-- Alerts
-- Autoscaling
-- RBAC
-- Azure Policies
+The deployment work is scoped mainly to `rg-cloudnest-dev`, with subscription Reader for the checks which need subscription information.
 
----
+During the real deployment I found that policy assignment and role assignment needed a few more permissions. I added the narrow roles required for the resource group instead of giving wider access.
 
-# OIDC Authentication
+## Why I kept it manual
 
-GitHub Actions authenticates to Azure using:
+For this project I wanted the pipeline to prove that the infrastructure can be deployed, but I also wanted to avoid accidental Azure cost.
 
-```text
-OpenID Connect Federation
-```
+So validation is automatic, while Azure deployment needs a manual decision and checks before resources are created.
 
-Benefits:
-
-- No client secrets stored in GitHub
-- Secure short-lived tokens
-- Enterprise-grade authentication
-
----
-
-# Validation and What-If
-
-Before deployment:
-
-```text
-Validate
-+
-What-If
-```
-
-are executed automatically.
-
-This helps detect infrastructure changes before deployment.
-
----
-
-# Deployment Strategy
-
-Infrastructure deployments use:
-
-```text
-Incremental ARM deployment mode
-```
-
-Benefits:
-
-- Existing resources remain intact
-- Safe iterative deployments
-- Production-friendly deployment model
-
----
-
-# CI/CD Flow
-
-```text
-Git Push
-    ↓
-GitHub Actions
-    ↓
-Bicep Validation
-    ↓
-What-If Analysis
-    ↓
-Azure Deployment
-```
-
----
-
-# Portfolio Value
-
-This phase demonstrates:
-
-- Infrastructure as Code
-- Cloud automation
-- CI/CD engineering
-- Azure DevOps practices
-- Secure cloud deployments
-- Enterprise deployment workflows
-- Automated infrastructure validation
+The successful deployment record is in [portfolio deployment verification](evidence/portfolio-deployment/live-deployment-verification.md).
