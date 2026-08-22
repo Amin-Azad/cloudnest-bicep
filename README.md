@@ -1,76 +1,114 @@
 # CloudNest
 
-CloudNest is a personal Azure project I made to practice how a full cloud setup works when it is not only written in Bicep but actually deployed.
+CloudNest is a personal Azure project I built to practice infrastructure as code, secure networking and deployment automation.
 
-The repository has two parts. The first one is the full production-style design with two regions, Front Door, WAF, App Service, SQL, private endpoints, monitoring, autoscale and policy. The second one is a smaller portfolio profile which I used for the real Azure deployment because my subscription had quota and cost limits.
+The repository contains a larger production-style Bicep design and a smaller portfolio profile that I deployed successfully in Azure. I kept the two separate because my subscription had quota and cost limits.
 
 ## What I deployed
 
-The portfolio profile was deployed successfully through GitHub Actions using OIDC and a guarded manual workflow.
+The portfolio profile ran in Sweden Central and was deployed through a guarded GitHub Actions workflow using OpenID Connect (OIDC).
 
-The live deployment included B1 App Service, Azure SQL Free, VNet integration, private endpoints for SQL, Storage and Key Vault, Managed Identity, RBAC, Log Analytics, Application Insights, diagnostic settings, alerts and Azure Policy.
+The deployed environment included:
 
-Azure Policy was checked after deployment and showed 100% compliance. I also captured screenshots and deployment details before removing the workload resources again to stop ongoing cost.
+- one B1 Linux App Service with VNet integration;
+- Azure SQL Free with public network access disabled;
+- a Storage account and Key Vault with public network access disabled;
+- four approved private endpoints for SQL, Blob Storage, File Storage and Key Vault;
+- private DNS zones and virtual network links;
+- a system-assigned Managed Identity with scoped Key Vault and Storage RBAC;
+- Log Analytics, Application Insights, diagnostic settings and alerts;
+- Azure Policy assignments and tagging controls.
 
-The full verification is here:
+I verified 32 live resources before cleanup. Azure Policy reported 31 compliant resources out of 31 evaluated, with no non-compliant policies.
+
+The deployment record and supporting screenshots are here:
 
 - [Live deployment verification](docs/evidence/portfolio-deployment/live-deployment-verification.md)
 - [Deployment qualification](docs/evidence/portfolio-deployment/qualification-summary.md)
-- [Deployment screenshots](docs/evidence/portfolio-deployment/screenshots)
+- [Successful GitHub Actions deployment](docs/evidence/portfolio-deployment/screenshots/01-github-success.png)
+- [Running App Service](docs/evidence/portfolio-deployment/screenshots/03-app-service-running.png)
+- [Azure SQL Free online](docs/evidence/portfolio-deployment/screenshots/04-sql-free-online.png)
+- [Approved SQL private endpoint](docs/evidence/portfolio-deployment/screenshots/06-sql-private-endpoint-approved.png)
+- [Approved Key Vault private endpoint](docs/evidence/portfolio-deployment/screenshots/08-keyvault-private-endpoint-approved.png)
+- [Approved Storage private endpoints](docs/evidence/portfolio-deployment/screenshots/10-storage-private-endpoints-approved.png)
+- [Managed Identity RBAC assignments](docs/evidence/portfolio-deployment/screenshots/13-webapp-managed-identity-rbac.png)
+- [Azure Policy compliance](docs/evidence/portfolio-deployment/screenshots/18-policy-compliance.png)
+- [Successful Azure deployment](docs/evidence/portfolio-deployment/screenshots/19-azure-deployment-success.png)
 
-## Full design and portfolio profile
+## What the full design includes
 
-The full Bicep design keeps the bigger architecture in the repo. It includes a primary and DR region, Front Door with WAF, App Service deployment slot and autoscale.
+The larger Bicep design also includes a disaster-recovery region, Azure Front Door with WAF, an App Service deployment slot and autoscaling.
 
-I did not try to pretend the small portfolio deployment was the same thing. For the live test I disabled DR, Front Door, deployment slot and autoscale, then used one B1 App Service and Azure SQL Free in Sweden Central.
+Those features are implemented in the repository, but they were disabled in the portfolio deployment. I do not present them as live-tested resources.
 
-This gave me a setup I could actually deploy, validate and clean up without keeping unnecessary Azure cost running.
+The deployed profile used:
 
-## What I learned from the real deployment
+```text
+enableDr             = false
+enableFrontDoor      = false
+enableDeploymentSlot = false
+enableAutoscale      = false
+```
 
-The real deployment showed some problems which static validation did not show. I had issues with GitHub OIDC federation, Azure RBAC permissions, Azure Policy, SQL Free limits and parallel subnet deployment.
-
-I corrected these one by one and deployed again. The subnet race condition was fixed by serializing the writes in Bicep. I also kept the deployment identity limited instead of giving subscription Owner access.
-
-This part was important for me because it showed the difference between infrastructure that only looks correct in code and infrastructure that actually works in Azure.
+This kept the real deployment within the available subscription, quota and cost limits.
 
 ## Security
 
-The deployed portfolio profile used private endpoints for SQL, Storage and Key Vault. Public network access was disabled for these services.
+SQL, Storage and Key Vault were deployed with public network access disabled. Access to those services used approved private endpoints and private DNS.
 
-The Web App used a system-assigned Managed Identity. It received Key Vault Secrets User on the Key Vault and Storage Blob Data Reader on the Storage Account.
+The Web App used a system-assigned Managed Identity with:
 
-The GitHub deployment uses OIDC, so no Azure client secret is stored in GitHub. The deployment identity is scoped mainly to `rg-cloudnest-dev` and does not have subscription Owner access.
+- Key Vault Secrets User on the Key Vault;
+- Storage Blob Data Reader on the Storage account.
+
+GitHub Actions authenticated to Azure through OIDC. No Azure client secret was stored in GitHub, and the deployment identity did not have subscription Owner access.
 
 More detail is in [SECURITY.md](SECURITY.md).
 
-## CI/CD
+## Deployment workflow
 
-The repository uses GitHub Actions for validation, What-If and guarded deployment.
+The repository includes separate GitHub Actions workflows for:
 
-For the portfolio deployment I had to choose the portfolio profile, type `DEPLOY-PORTFOLIO` and provide the exact approved commit SHA. The workflow checked that the deployed commit matched the approved commit before Azure deployment started.
+- [repository validation](.github/workflows/validate.yml);
+- [Azure What-If](.github/workflows/dev-what-if.yml);
+- [guarded deployment](.github/workflows/dev-deployment.yml).
 
-It also ran Azure validation and What-If and stopped if destructive changes were found.
+The portfolio deployment required the correct profile, the `DEPLOY-PORTFOLIO` confirmation and an approved commit SHA.
+
+The workflow checked the commit, ran Azure validation and What-If, and stopped if destructive changes were detected.
+
+## Problems I had to fix
+
+Deploying to a real subscription exposed issues that a successful Bicep build did not show:
+
+- the original GitHub OIDC federation subject did not match the environment token;
+- the deployment identity needed narrowly scoped policy and RBAC permissions;
+- hard require-tag policies blocked Private DNS virtual network links;
+- Azure SQL Free exposed a smaller database limit on this subscription;
+- parallel subnet writes caused `AnotherOperationInProgress` errors.
+
+I corrected the identity and policy configuration, adapted the SQL settings and serialized subnet deployment in Bicep.
 
 ## Cleanup
 
-After the successful deployment I captured the Azure and GitHub evidence, then removed the portfolio workload to stop ongoing cost.
+After verification, I removed the workload resources to stop ongoing Azure charges.
 
-`rg-cloudnest-dev` was recreated empty and the least-privilege deployment foundation was kept so the environment can be deployed again later.
+The resource group was recreated empty, and the deployment identity was kept with limited access so I can deploy the environment again later.
+
+[Post-cleanup empty resource group](docs/evidence/portfolio-deployment/screenshots/20-post-cleanup-empty-resource-group.png)
 
 ## Repository layout
 
 ```text
-.
-├── .github/workflows/       validation, What-If and guarded deployment
-├── docs/                    project notes and deployment evidence
-├── infra/                   Bicep and deployment parameters
-├── scripts/                 validation and readiness checks
-├── src/                     small Node.js app
-├── ARCHITECTURE.md
-├── SECURITY.md
-├── OPERATIONS.md
-└── GOVERNANCE.md
+.github/workflows/   validation, What-If and guarded deployment
+docs/                project notes and verified deployment evidence
+infra/               Bicep modules and deployment parameters
+scripts/             validation and subscription readiness checks
+src/                 small Node.js application
+ARCHITECTURE.md      full architecture notes
+SECURITY.md          security controls and access model
+OPERATIONS.md        operational notes
+GOVERNANCE.md        policy and governance notes
 ```
 
 ## Local checks
@@ -82,9 +120,7 @@ node --check src/app.js
 az bicep build --file infra/main.bicep --stdout > /dev/null
 ```
 
-## Note
-
-This is a portfolio project, not a production service. The full architecture is there to show the design, while the smaller portfolio profile is the version I actually deployed and verified in Azure.
+This is a portfolio project, not a production service. The full architecture shows what is designed; the smaller portfolio profile shows what was actually deployed.
 
 ## Licence
 
