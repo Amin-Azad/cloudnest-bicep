@@ -2,15 +2,19 @@
 
 CloudNest has a bigger production-style design and a smaller portfolio profile which I used for the real Azure deployment.
 
-The full design stays in Bicep because I wanted to show how I would structure the platform with regional failover, Front Door, WAF, deployment slot and autoscale. The smaller profile was made because my Azure subscription had real quota and cost limits.
+The full design stays in Bicep because I wanted to show how I would structure the platform with application-origin failover, Front Door, WAF, deployment slot and autoscale. The smaller profile was made because my Azure subscription had real quota and cost limits.
 
 ## Full design
 
-The full design uses West Europe as the primary region and Sweden Central as the DR region.
+The full design uses West Europe as the primary application region and Sweden Central as the secondary application region.
+
+![Full CloudNest architecture design](docs/architecture/full-architecture-design.png)
 
 Traffic enters through Azure Front Door with WAF. Front Door can route to the primary and secondary App Service origins. The primary App Service also has a staging slot and autoscale in the full design.
 
-The application layer connects to Azure SQL, Storage and Key Vault through the VNet and private endpoints. Private DNS zones are used for the private service names.
+The application layer connects to Azure SQL, Storage and Key Vault through the VNet and private endpoints. Cross-region VNet peering and linked private DNS zones allow the secondary application region to reach those services.
+
+SQL, Storage and Key Vault remain in West Europe. The Sweden Central application origin provides application failover, not full regional data recovery.
 
 The Web App uses Managed Identity for Azure access. Monitoring is built with Application Insights, Log Analytics, diagnostic settings and Azure Monitor alerts. Azure Policy is used for location, tagging and storage security rules.
 
@@ -18,7 +22,7 @@ The Web App uses Managed Identity for Azure access. Monitoring is built with App
 flowchart TD
     A[Users] --> B[Azure Front Door + WAF]
     B --> C[Primary App Service - West Europe]
-    B --> D[DR App Service - Sweden Central]
+    B --> D[Secondary App Service - Sweden Central]
     C --> E[Staging slot]
     C --> F[Managed Identity]
     D --> F
@@ -40,11 +44,15 @@ flowchart TD
 
 For the live portfolio deployment I reduced the design instead of trying to deploy everything only for showing it.
 
+![Verified CloudNest portfolio deployment in Sweden Central](docs/architecture/verified-portfolio-deployment.png)
+
 The portfolio profile used Sweden Central, one B1 App Service and Azure SQL Free. DR, Front Door, deployment slot and autoscale were disabled for this profile.
 
 The parts I wanted to prove in Azure were still there: VNet integration, private endpoints, private DNS, Key Vault, Storage, Managed Identity, RBAC, monitoring, diagnostics, alerts and Azure Policy.
 
 This profile was successfully deployed and checked from the Azure control plane. The evidence is in [live deployment verification](docs/evidence/portfolio-deployment/live-deployment-verification.md).
+
+Both architecture diagrams are available in the [editable draw.io file](docs/architecture/cloudnest-architecture.drawio).
 
 ## Why I kept both
 
@@ -60,7 +68,7 @@ I used Bicep because I wanted the infrastructure to stay repeatable and version 
 
 I used App Service because I wanted a managed application platform instead of managing virtual machines.
 
-Front Door and WAF are part of the full design for public entry, routing and regional failover. They were not needed for the small live portfolio deployment.
+Front Door and WAF are part of the full design for public entry, routing and application-origin failover. They were not needed for the small live portfolio deployment.
 
 Private endpoints were important because I wanted SQL, Storage and Key Vault away from public network access in the deployed profile.
 

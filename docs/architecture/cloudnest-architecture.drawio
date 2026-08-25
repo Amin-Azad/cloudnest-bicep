@@ -1,0 +1,354 @@
+<mxfile host="app.diagrams.net" agent="draw.io" pages="2" scale="1" border="0">
+  <diagram id="full-design" name="Full Architecture Design">
+    <mxGraphModel dx="2500" dy="948" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1750" pageHeight="1230" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=27;fontStyle=1;fontColor=#16324F;" value="CloudNest | Full Architecture Design" vertex="1">
+          <mxGeometry height="40" width="880" x="35" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="subtitle" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=14;fontColor=#52677F;" value="Target architecture: West Europe application platform with Sweden Central application-origin failover" vertex="1">
+          <mxGeometry height="25" width="1150" x="38" y="63" as="geometry" />
+        </mxCell>
+        <mxCell id="users" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#A8B9CB;fontColor=#17324D;fontStyle=1;" value="Users / internet traffic" vertex="1">
+          <mxGeometry height="65" width="190" x="40" y="110" as="geometry" />
+        </mxCell>
+        <mxCell id="frontdoor" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5EE;strokeColor=#42A469;fontColor=#205C3B;fontStyle=1;" value="Azure Front Door + WAF&#xa;Global entry point and origin failover" vertex="1">
+          <mxGeometry height="75" width="320" x="275" y="105" as="geometry" />
+        </mxCell>
+        <mxCell id="repo" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#A8B9CB;fontColor=#17324D;fontStyle=1;" value="GitHub repository&#xa;Bicep modules and parameters" vertex="1">
+          <mxGeometry height="65" width="230" x="740" y="110" as="geometry" />
+        </mxCell>
+        <mxCell id="actions" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E7F1FB;strokeColor=#428BCA;fontColor=#174C79;fontStyle=1;" value="GitHub Actions + OIDC&#xa;Validate, What-If and deploy" vertex="1">
+          <mxGeometry height="75" width="295" x="1020" y="105" as="geometry" />
+        </mxCell>
+        <mxCell id="policy" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5EE;strokeColor=#42A469;fontColor=#205C3B;fontStyle=1;" value="Azure Policy&#xa;Resource governance" vertex="1">
+          <mxGeometry height="65" width="260" x="1370" y="110" as="geometry" />
+        </mxCell>
+        <mxCell id="primary-region" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;spacingTop=15;align=left;spacingLeft=17;fontSize=17;fontStyle=1;fontColor=#17324D;fillColor=#F2F6FA;strokeColor=#C5D6E5;" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;PRIMARY APPLICATION REGION | WEST EUROPE&lt;/font&gt;" vertex="1">
+          <mxGeometry height="749" width="780" x="35" y="225" as="geometry" />
+        </mxCell>
+        <mxCell id="plan" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E7F1FB;strokeColor=#428BCA;fontColor=#174C79;fontStyle=1;" value="App Service Plan&#xa;Primary web application" vertex="1">
+          <mxGeometry height="80" width="320" x="80" y="290" as="geometry" />
+        </mxCell>
+        <mxCell id="slot" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E7F1FB;strokeColor=#428BCA;fontColor=#174C79;" value="Staging deployment slot" vertex="1">
+          <mxGeometry height="53" width="285" x="440" y="280" as="geometry" />
+        </mxCell>
+        <mxCell id="autoscale" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF3E3;strokeColor=#E9A337;fontColor=#8B571C;" value="App Service Plan autoscale" vertex="1">
+          <mxGeometry height="53" width="285" x="440" y="350" as="geometry" />
+        </mxCell>
+        <mxCell id="primary-vnet" parent="1" style="rounded=1;whiteSpace=wrap;html=1;verticalAlign=top;spacingTop=12;align=left;spacingLeft=15;fontStyle=1;fontSize=15;fontColor=#174C79;fillColor=#EAF3FC;strokeColor=#91BCE6;" value="Primary virtual network" vertex="1">
+          <mxGeometry height="235" width="700" x="70" y="435" as="geometry" />
+        </mxCell>
+        <mxCell id="integration" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#A8B9CB;fontColor=#17324D;" value="App Service integration subnet&#xa;Outbound VNet integration" vertex="1">
+          <mxGeometry height="65" width="300" x="95" y="490" as="geometry" />
+        </mxCell>
+        <mxCell id="pe-subnet" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5EE;strokeColor=#42A469;fontColor=#205C3B;fontStyle=1;" value="Private-endpoint subnet&#xa;SQL | Key Vault | Blob | File" vertex="1">
+          <mxGeometry height="65" width="315" x="425" y="490" as="geometry" />
+        </mxCell>
+        <mxCell id="dns" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5EE;strokeColor=#42A469;fontColor=#205C3B;fontSize=11;" value="Private DNS zones&#xa;database.windows.net | vaultcore.azure.net | blob.core.windows.net | file.core.windows.net" vertex="1">
+          <mxGeometry height="60" width="645" x="95" y="580" as="geometry" />
+        </mxCell>
+        <mxCell id="sql" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F0ECFA;strokeColor=#8E75BC;fontColor=#4D3F6B;fontStyle=1;" value="Azure SQL Database&#xa;Public network access disabled" vertex="1">
+          <mxGeometry height="80" width="215" x="85" y="730" as="geometry" />
+        </mxCell>
+        <mxCell id="storage" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F0ECFA;strokeColor=#8E75BC;fontColor=#4D3F6B;fontStyle=1;" value="Azure Storage&#xa;Blob and File services" vertex="1">
+          <mxGeometry height="80" width="215" x="325" y="730" as="geometry" />
+        </mxCell>
+        <mxCell id="vault" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5EE;strokeColor=#42A469;fontColor=#205C3B;fontStyle=1;" value="Azure Key Vault&#xa;Secrets and RBAC" vertex="1">
+          <mxGeometry height="80" width="185" x="565" y="730" as="geometry" />
+        </mxCell>
+        <mxCell id="identity" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5EE;strokeColor=#42A469;fontColor=#205C3B;fontStyle=1;" value="System-assigned managed identity&#xa;Key Vault and Storage RBAC assignments" vertex="1">
+          <mxGeometry height="75" width="665" x="85" y="860" as="geometry" />
+        </mxCell>
+        <mxCell id="secondary-region" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;spacingTop=15;align=left;spacingLeft=17;fontSize=17;fontStyle=1;fontColor=#17324D;fillColor=#F2F6FA;strokeColor=#C5D6E5;" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;SECONDARY APPLICATION REGION | SWEDEN CENTRAL&lt;/font&gt;" vertex="1">
+          <mxGeometry height="380" width="480" x="1160" y="225" as="geometry" />
+        </mxCell>
+        <mxCell id="secondary-app" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E7F1FB;strokeColor=#428BCA;fontColor=#174C79;fontStyle=1;" value="Secondary App Service&#xa;Front Door failover origin" vertex="1">
+          <mxGeometry height="78" width="320" x="1231" y="310" as="geometry" />
+        </mxCell>
+        <mxCell id="secondary-vnet" parent="1" style="rounded=1;whiteSpace=wrap;html=1;verticalAlign=top;spacingTop=12;align=left;spacingLeft=15;fontStyle=1;fontSize=14;fontColor=#174C79;fillColor=#EAF3FC;strokeColor=#91BCE6;" value="Secondary virtual network" vertex="1">
+          <mxGeometry height="130" width="397" x="1188" y="405" as="geometry" />
+        </mxCell>
+        <mxCell id="secondary-integration" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#A8B9CB;fontColor=#17324D;" value="App Service integration subnet&#xa;Outbound VNet integration" vertex="1">
+          <mxGeometry height="55" width="315" x="1210" y="442.5" as="geometry" />
+        </mxCell>
+        <mxCell id="WR_qzfrLxBbMDf6kCsWH-1" edge="1" parent="1" source="peering" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;startArrow=classic;startFill=1;" target="secondary-vnet" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="peering" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E7F1FB;strokeColor=#428BCA;fontColor=#174C79;" value="Cross-region VNet peering&#xa;Primary and secondary networks" vertex="1">
+          <mxGeometry height="55" width="260" x="870" y="442.5" as="geometry" />
+        </mxCell>
+        <mxCell id="monitoring" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;spacingTop=15;align=left;spacingLeft=17;fontSize=17;fontStyle=1;fontColor=#17324D;fillColor=#F2F6FA;strokeColor=#C5D6E5;" value="SHARED MONITORING AND SECURITY" vertex="1">
+          <mxGeometry height="340" width="790" x="850" y="640" as="geometry" />
+        </mxCell>
+        <mxCell id="appinsights" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF3E3;strokeColor=#E9A337;fontColor=#8B571C;fontStyle=1;" value="Application Insights&#xa;Application telemetry" vertex="1">
+          <mxGeometry height="75" width="260" x="900" y="715" as="geometry" />
+        </mxCell>
+        <mxCell id="diagnostics" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF3E3;strokeColor=#E9A337;fontColor=#8B571C;fontStyle=1;" value="Diagnostic settings&#xa;Resource logs and metrics" vertex="1">
+          <mxGeometry height="75" width="325" x="1250" y="715" as="geometry" />
+        </mxCell>
+        <mxCell id="loganalytics" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF3E3;strokeColor=#E9A337;fontColor=#8B571C;fontStyle=1;" value="Log Analytics workspace&#xa;Centralized log collection" vertex="1">
+          <mxGeometry height="75" width="260" x="900" y="840" as="geometry" />
+        </mxCell>
+        <mxCell id="alerts" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF3E3;strokeColor=#E9A337;fontColor=#8B571C;fontStyle=1;" value="Azure Monitor alerts&#xa;Action group notifications" vertex="1">
+          <mxGeometry height="75" width="325" x="1250" y="840" as="geometry" />
+        </mxCell>
+        <mxCell id="design-note" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF8E9;strokeColor=#E5B957;fontColor=#855B23;fontStyle=1;align=left;spacingLeft=15;" value="DESIGN ONLY | Sweden Central provides application-origin failover. SQL, Storage and Key Vault remain in West Europe; full regional data recovery is not represented." vertex="1">
+          <mxGeometry height="72" width="1605" x="35" y="1010" as="geometry" />
+        </mxCell>
+        <mxCell id="e1" edge="1" parent="1" source="users" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#607D96;endArrow=block;endFill=1;fillColor=#1A1A1A;" target="frontdoor">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2" edge="1" parent="1" source="repo" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#607D96;endArrow=block;endFill=1;fillColor=#1A1A1A;" target="actions">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e3" edge="1" parent="1" source="frontdoor" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#607D96;fontSize=10;endArrow=block;endFill=1;fillColor=#1A1A1A;" target="plan" value="primary origin">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e4" edge="1" parent="1" source="frontdoor" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#607D96;fontSize=10;endArrow=block;endFill=1;exitX=0.85;exitY=1;entryX=0.5;entryY=0;fillColor=#1A1A1A;" target="secondary-app" value="secondary origin">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="550" y="205" />
+              <mxPoint x="1055" y="205" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e5" edge="1" parent="1" source="actions" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#607D96;fontSize=10;endArrow=block;endFill=1;entryX=0.863;entryY=0.005;entryDx=0;entryDy=0;entryPerimeter=0;fillColor=#1A1A1A;" target="primary-region" value="Bicep deployment">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1167.5" y="70" />
+              <mxPoint x="708.13" y="70" />
+            </Array>
+            <mxPoint x="710" y="220" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e6" edge="1" parent="1" source="policy" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#42A469;fontSize=10;dashed=1;endArrow=block;endFill=1;" target="secondary-region" value="resource evaluation">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1500" y="190" />
+              <mxPoint x="1245" y="190" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e7" edge="1" parent="1" source="plan" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#607D96;endArrow=block;endFill=1;" target="slot">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="420.05" y="320" />
+              <mxPoint x="420.05" y="306.48" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e8" edge="1" parent="1" source="autoscale" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#E9A337;endArrow=block;endFill=1;" target="plan">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e9" edge="1" parent="1" source="plan" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#428BCA;dashed=1;fontSize=10;endArrow=block;endFill=1;" target="integration" value="outbound only">
+          <mxGeometry relative="1" x="-0.1667" as="geometry">
+            <mxPoint as="offset" />
+            <Array as="points">
+              <mxPoint x="300" y="470" />
+              <mxPoint x="300" y="470" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e10" edge="1" parent="1" source="integration" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#607D96;endArrow=block;endFill=1;" target="pe-subnet">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e11" edge="1" parent="1" source="pe-subnet" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#607D96;endArrow=block;endFill=1;fillColor=#1A1A1A;" target="sql">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="520.05" y="570" />
+              <mxPoint x="150.05" y="570" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e12" edge="1" parent="1" source="pe-subnet" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#607D96;endArrow=block;endFill=1;fillColor=#1A1A1A;" target="storage">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="570.05" y="660" />
+              <mxPoint x="432.52" y="660" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e13" edge="1" parent="1" source="pe-subnet" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#607D96;endArrow=block;endFill=1;fillColor=#1A1A1A;" target="vault">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="657.48" y="580" />
+              <mxPoint x="657.48" y="580" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e14" edge="1" parent="1" source="secondary-app" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#428BCA;dashed=1;endArrow=block;endFill=1;entryX=0.795;entryY=0.009;entryDx=0;entryDy=0;entryPerimeter=0;" target="secondary-integration">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1460" y="430" />
+              <mxPoint x="1460" y="430" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e15" edge="1" parent="1" source="appinsights" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#E9A337;endArrow=block;endFill=1;" target="loganalytics">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e16" edge="1" parent="1" source="diagnostics" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#E9A337;endArrow=block;endFill=1;" target="loganalytics">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1412.52" y="810" />
+              <mxPoint x="1070.05" y="810" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e17" edge="1" parent="1" source="loganalytics" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#E9A337;endArrow=block;endFill=1;" target="alerts">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ddu5ZVoZF_n8CSFDF_Oy-3" edge="1" parent="1" source="primary-vnet" style="endArrow=classic;startArrow=classic;html=1;rounded=0;exitX=1;exitY=0.165;exitDx=0;exitDy=0;startFill=1;exitPerimeter=0;" target="peering" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <Array as="points" />
+            <mxPoint x="810" y="570" as="sourcePoint" />
+            <mxPoint x="870" y="473.77" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ddu5ZVoZF_n8CSFDF_Oy-5" edge="1" parent="1" source="dns" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;dashed=1;entryX=0.089;entryY=0.992;entryDx=0;entryDy=0;entryPerimeter=0;" target="secondary-vnet" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <Array as="points">
+              <mxPoint x="1223.33" y="610" />
+            </Array>
+            <mxPoint x="690" y="670" as="sourcePoint" />
+            <mxPoint x="960" y="540" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ddu5ZVoZF_n8CSFDF_Oy-7" edge="1" parent="1" source="identity" style="endArrow=classic;startArrow=none;html=1;rounded=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=0;exitY=0.5;exitDx=0;exitDy=0;startFill=0;" target="plan" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <Array as="points">
+              <mxPoint x="50" y="897.5" />
+              <mxPoint x="50" y="630" />
+              <mxPoint x="50" y="330" />
+            </Array>
+            <mxPoint x="810" y="610" as="sourcePoint" />
+            <mxPoint x="860" y="560" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ddu5ZVoZF_n8CSFDF_Oy-9" edge="1" parent="1" source="identity" style="endArrow=classic;startArrow=none;html=1;rounded=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;startFill=0;" target="secondary-app" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <Array as="points">
+              <mxPoint x="830" y="897.5" />
+              <mxPoint x="830" y="349" />
+            </Array>
+            <mxPoint x="800" y="894" as="sourcePoint" />
+            <mxPoint x="805" y="326" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ddu5ZVoZF_n8CSFDF_Oy-10" edge="1" parent="1" source="policy" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#42A469;fontSize=10;dashed=1;endArrow=block;endFill=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.75;entryY=0;entryDx=0;entryDy=0;" target="primary-region" value="">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1500" y="190" />
+              <mxPoint x="620" y="190" />
+            </Array>
+            <mxPoint x="1455" y="190" as="sourcePoint" />
+            <mxPoint x="1200" y="240" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="verified-deployment" name="Verified Portfolio Deployment">
+    <mxGraphModel dx="2143" dy="813" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1550" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="v-title" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=27;fontStyle=1;fontColor=#16324F;" value="CloudNest | Verified Portfolio Deployment" vertex="1">
+          <mxGeometry height="40" width="920" x="35" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="v-subtitle" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=14;fontColor=#52677F;" value="Successfully deployed and verified configuration | Sweden Central | Single-region portfolio environment" vertex="1">
+          <mxGeometry height="25" width="1200" x="38" y="65" as="geometry" />
+        </mxCell>
+        <mxCell id="v-repo" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#A8B9CB;fontColor=#17324D;fontStyle=1;" value="GitHub repository&#xa;Portfolio Bicep parameters" vertex="1">
+          <mxGeometry height="75" width="270" x="50" y="115" as="geometry" />
+        </mxCell>
+        <mxCell id="v-actions" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E7F1FB;strokeColor=#428BCA;fontColor=#174C79;fontStyle=1;" value="GitHub Actions + OIDC&#xa;Validate | What-If | guarded deploy" vertex="1">
+          <mxGeometry height="75" width="370" x="370" y="115" as="geometry" />
+        </mxCell>
+        <mxCell id="v-policy" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5EE;strokeColor=#42A469;fontColor=#205C3B;fontStyle=1;" value="Azure Policy&#xa;Resource compliance checks" vertex="1">
+          <mxGeometry height="75" width="285" x="800" y="115" as="geometry" />
+        </mxCell>
+        <mxCell id="v-cleanup" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5EE;strokeColor=#42A469;fontColor=#205C3B;fontStyle=1;" value="Guarded cleanup&#xa;Verified zero workload resources" vertex="1">
+          <mxGeometry height="75" width="330" x="1140" y="115" as="geometry" />
+        </mxCell>
+        <mxCell id="v-region" parent="1" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;spacingTop=15;align=left;spacingLeft=17;fontSize=17;fontStyle=1;fontColor=#17324D;fillColor=#F2F6FA;strokeColor=#C5D6E5;" value="VERIFIED DEPLOYMENT REGION | SWEDEN CENTRAL" vertex="1">
+          <mxGeometry height="670" width="1425" x="45" y="240" as="geometry" />
+        </mxCell>
+        <mxCell id="v-app" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E7F1FB;strokeColor=#428BCA;fontColor=#174C79;fontStyle=1;" value="App Service Plan + web application&#xa;HTTPS enforced | outbound VNet integration" vertex="1">
+          <mxGeometry height="85" width="500" x="100" y="315" as="geometry" />
+        </mxCell>
+        <mxCell id="v-identity" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5EE;strokeColor=#42A469;fontColor=#205C3B;fontStyle=1;" value="System-assigned managed identity&#xa;Key Vault and Storage RBAC" vertex="1">
+          <mxGeometry height="75" width="365" x="660" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="v-monitor" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF3E3;strokeColor=#E9A337;fontColor=#8B571C;fontStyle=1;" value="Application Insights + Log Analytics&#xa;Azure Monitor alerts and action group" vertex="1">
+          <mxGeometry height="75" width="340" x="1080" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="v-vnet" parent="1" style="rounded=1;whiteSpace=wrap;html=1;verticalAlign=top;spacingTop=12;align=left;spacingLeft=15;fontStyle=1;fontSize=15;fontColor=#174C79;fillColor=#EAF3FC;strokeColor=#91BCE6;" value="Virtual network" vertex="1">
+          <mxGeometry height="190" width="1320" x="100" y="445" as="geometry" />
+        </mxCell>
+        <mxCell id="v-subnet" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#A8B9CB;fontColor=#17324D;" value="App Service integration subnet&#xa;Outbound traffic" vertex="1">
+          <mxGeometry height="70" width="315" x="130" y="505" as="geometry" />
+        </mxCell>
+        <mxCell id="v-pe" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5EE;strokeColor=#42A469;fontColor=#205C3B;fontStyle=1;" value="Private-endpoint subnet&#xa;Four endpoints: SQL | Key Vault | Blob | File" vertex="1">
+          <mxGeometry height="70" width="460" x="500" y="505" as="geometry" />
+        </mxCell>
+        <mxCell id="v-dns" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5EE;strokeColor=#42A469;fontColor=#205C3B;" value="Private DNS zones&#xa;SQL | Key Vault | Blob | File" vertex="1">
+          <mxGeometry height="70" width="365" x="1010" y="505" as="geometry" />
+        </mxCell>
+        <mxCell id="v-sql" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F0ECFA;strokeColor=#8E75BC;fontColor=#4D3F6B;fontStyle=1;" value="Azure SQL Database&#xa;Public network access disabled" vertex="1">
+          <mxGeometry height="85" width="355" x="180" y="715" as="geometry" />
+        </mxCell>
+        <mxCell id="v-storage" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F0ECFA;strokeColor=#8E75BC;fontColor=#4D3F6B;fontStyle=1;" value="Azure Storage&#xa;Blob and File private endpoints" vertex="1">
+          <mxGeometry height="85" width="355" x="585" y="715" as="geometry" />
+        </mxCell>
+        <mxCell id="v-vault" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5EE;strokeColor=#42A469;fontColor=#205C3B;fontStyle=1;" value="Azure Key Vault&#xa;Private endpoint | secrets | RBAC" vertex="1">
+          <mxGeometry height="85" width="355" x="990" y="715" as="geometry" />
+        </mxCell>
+        <mxCell id="v-note" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF8E9;strokeColor=#E5B957;fontColor=#855B23;fontStyle=1;align=left;spacingLeft=15;" value="VERIFIED DEPLOYMENT | Front Door, WAF, deployment slots, autoscaling and the secondary region were excluded from this cost-controlled portfolio profile." vertex="1">
+          <mxGeometry height="70" width="1425" x="45" y="945" as="geometry" />
+        </mxCell>
+        <mxCell id="ve1" edge="1" parent="1" source="v-repo" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#607D96;endArrow=block;endFill=1;" target="v-actions">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ve2" edge="1" parent="1" source="v-actions" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#607D96;endArrow=block;endFill=1;entryX=0.457;entryY=0.004;entryDx=0;entryDy=0;entryPerimeter=0;" target="v-region">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ve3" edge="1" parent="1" source="v-policy" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#42A469;dashed=1;endArrow=block;endFill=1;" target="v-region">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ve4" edge="1" parent="1" source="v-app" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#428BCA;dashed=1;endArrow=block;endFill=1;" target="v-subnet">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ve5" edge="1" parent="1" source="v-subnet" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#607D96;endArrow=block;endFill=1;" target="v-pe">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ve6" edge="1" parent="1" source="v-pe" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#607D96;endArrow=block;endFill=1;" target="v-sql">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="560" y="670" />
+              <mxPoint x="357.57" y="670" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ve7" edge="1" parent="1" source="v-pe" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#607D96;endArrow=block;endFill=1;" target="v-storage">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ve8" edge="1" parent="1" source="v-pe" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#607D96;endArrow=block;endFill=1;" target="v-vault">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="970" y="540" />
+              <mxPoint x="970" y="757.57" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ve9" edge="1" parent="1" source="v-app" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#42A469;endArrow=block;endFill=1;" target="v-identity">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
