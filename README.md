@@ -8,6 +8,8 @@ The repository contains a larger production-style Bicep design and a smaller por
 
 The portfolio profile ran in Sweden Central and was deployed through a guarded GitHub Actions workflow using OpenID Connect (OIDC).
 
+![Verified CloudNest portfolio deployment in Sweden Central](docs/architecture/verified-portfolio-deployment.png)
+
 The deployed environment included:
 
 - one B1 Linux App Service with VNet integration;
@@ -37,9 +39,15 @@ The deployment record and supporting screenshots are here:
 
 ## What the full design includes
 
-The larger Bicep design also includes a disaster-recovery region, Azure Front Door with WAF, an App Service deployment slot and autoscaling.
+The larger Bicep design uses West Europe as the primary application region and Sweden Central as a secondary application region. It also includes Azure Front Door with WAF, an App Service deployment slot, autoscaling and cross-region VNet peering.
+
+![Full CloudNest architecture design with West Europe and Sweden Central application origins](docs/architecture/full-architecture-design.png)
+
+Sweden Central provides application-origin failover in this design. SQL, Storage and Key Vault stay in West Europe, so the architecture does not claim full regional data recovery.
 
 Those features are implemented in the repository, but they were disabled in the portfolio deployment. I do not present them as live-tested resources.
+
+The [editable draw.io architecture file](docs/architecture/cloudnest-architecture.drawio) contains both diagrams.
 
 The deployed profile used:
 
@@ -102,6 +110,7 @@ The resource group was recreated empty, and the deployment identity was kept wit
 ```text
 .github/workflows/   validation, What-If and guarded deployment
 docs/                project notes and verified deployment evidence
+docs/architecture/   full design, verified deployment and editable diagrams
 infra/               Bicep modules and deployment parameters
 scripts/             validation and subscription readiness checks
 src/                 small Node.js application
