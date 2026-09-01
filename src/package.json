@@ -7,7 +7,7 @@
     "start": "node app.js"
   },
   "dependencies": {
-    "@azure/identity": "^4.13.1",
+    "@azure/identity": "^4.13.2",
     "@azure/storage-blob": "^12.31.0",
     "express": "^4.22.2",
     "mssql": "^9.3.2"
