@@ -62,7 +62,10 @@ jobs:
             --stdout >/dev/null
 
       - name: Check Bash syntax
-        run: bash -n scripts/*.sh
+        run: bash -n scripts/*.sh tests/infrastructure/*.sh
+
+      - name: Check infrastructure security regressions
+        run: bash tests/infrastructure/validate-cloudnest-security.sh
 
       - name: Check repository hygiene
         run: ./scripts/check-repository-hygiene.sh
