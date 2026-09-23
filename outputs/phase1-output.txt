@@ -1,8 +1,0 @@
-CloudNest historical phase 1 output
-Recorded during the first portfolio deployment.
-
-Deployment location: UK South
-Storage account resource ID: [redacted]
-Storage account name: [redacted]
-
-This file is historical evidence. It does not describe the current deployment state.
